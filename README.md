@@ -1,5 +1,7 @@
 **Language:** [한국어](README.md) | [日本語](README.ja.md)
 
+**중국어 번역 도움:** MUYANG
+
 # Skea clock
 
 > **스키아의 바보털은 세계제일**
