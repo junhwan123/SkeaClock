@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-ui="pageTitle">Skea Clock · 언어 만들기</title>
+  <style>:root{font-family:"Segoe UI","Malgun Gothic",sans-serif;color:#203443;background:#f5f7f9;font-synthesis:none;--accent:#176d65;--line:#dde5e9;--muted:#697c89}
+.load-bar.dragover{border-color:var(--accent);background:#e3f3ed;outline:3px solid #b7ddd0}
+.load-bar .drop-hint{color:#345f56}
+
+*{box-sizing:border-box}
+body{margin:0}
+button,input,textarea,select{font:inherit}
+button,.button{border:1px solid #cfdadf;background:white;color:#34515f;border-radius:8px;padding:9px 13px;cursor:pointer;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button:hover,.button:hover{background:#edf4f4}
+button:disabled{opacity:.45;cursor:default}
+.primary{background:var(--accent);color:white;border-color:var(--accent);font-weight:600}
+.primary:hover{background:#125d56}
+input,textarea,select{border:1px solid #cfdbdf;border-radius:7px;background:white;color:inherit;padding:10px 11px;min-width:0}
+input:focus,textarea:focus,select:focus{outline:2px solid #74bab0;outline-offset:2px}
+input,textarea{width:100%}
+textarea{resize:vertical;min-height:65px;line-height:1.55}
+textarea::placeholder,input::placeholder{color:#9babb4}
+button:focus-visible,.button:focus-visible{outline:3px solid #73b9ae;outline-offset:3px}
+
+.topbar{position:sticky;top:0;z-index:4;display:flex;justify-content:space-between;align-items:center;padding:16px 4vw;border-bottom:1px solid var(--line);background:#ffffffef;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:40px;height:40px;background:#e1f1ed;border-radius:12px;display:grid;place-items:center;font-size:31px;color:var(--accent)}
+.brand strong{font-size:15px;display:block}
+.brand div>span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.top-actions{display:flex;align-items:center;gap:20px}
+.top-actions>span{font-size:12px;color:var(--muted)}
+.ui-language{display:flex;border:1px solid #cfdadf;border-radius:8px;overflow:hidden;flex-shrink:0}
+.ui-language button{border:0;border-radius:0;padding:9px 11px;font-size:11px;font-weight:600}
+.ui-language button[aria-pressed="true"]{background:var(--accent);color:white}
+main{max-width:1600px;margin:auto;padding:30px 4vw 20px}
+.eyebrow{color:var(--accent);font-size:10px;font-weight:700;letter-spacing:2.6px}
+h1{font-size:29px;letter-spacing:-1px;margin:9px 0 12px;font-weight:650}
+.intro p{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 24px}
+.load-bar{display:flex;flex-wrap:wrap;align-items:center;gap:13px 24px;border:1px solid var(--line);background:white;border-radius:12px;padding:14px 18px;margin-bottom:25px}
+.reference-header{display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;font-weight:600}
+.reference-list{display:flex;flex-wrap:wrap;gap:8px}
+.reference-chip{display:inline-flex;align-items:center;gap:9px;padding:7px 10px;border:1px solid #d3e3dc;border-radius:9px;background:#edf5f1;font-size:12px;font-weight:500}
+.fixed-tag{font-size:10px;color:var(--muted)}
+.remove-reference{padding:0;width:20px;height:20px;border:0;background:transparent;color:#66857a;font-size:18px;line-height:1}
+.remove-reference:hover{background:#d7e9e1}
+.load-actions{margin-left:auto;display:flex;gap:8px}
+.load-bar p{flex-basis:100%;margin:0;color:var(--muted);font-size:12px;line-height:1.7}
+.load-bar p.error{color:#a52c35}
+
+.workspace{display:grid;grid-template-columns:minmax(340px,1fr) minmax(400px,1.02fr);gap:26px;align-items:start}
+.translation-panel{background:white;border:1px solid var(--line);border-radius:13px;padding:25px}
+.section-title{display:flex;gap:13px;align-items:flex-start;margin-bottom:20px}
+.step{font-size:10px;color:var(--accent);background:#edf5f3;padding:7px;border-radius:6px;font-weight:700}
+.section-title h2{font-size:17px;margin:0 0 5px;letter-spacing:-.4px}
+.section-title p,.hint{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+.metadata-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.metadata-grid label{font-size:12px;font-weight:600;display:grid;gap:8px}
+.hint{margin-top:12px}
+.translation-title{margin-top:30px;padding-top:25px;border-top:1px solid var(--line)}
+.column-labels{display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:10px;color:#8798a2;letter-spacing:.5px;padding:0 0 9px;border-bottom:1px solid var(--line)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:16px 0;border-bottom:1px solid #edf1f3;position:relative;transition:background .15s}
+.field-row.active{background:#f2f9f6;box-shadow:0 0 0 8px #f2f9f6;border-radius:3px}
+.source-label{font-size:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;align-self:center}
+.source-label .field-number{color:#93a3ae;font-size:10px;display:block;margin-bottom:5px}
+.reference-copy{display:block;margin-top:8px}
+.reference-name{display:block;font-size:10px;font-weight:600;color:#64887b;white-space:normal}
+.reference-value{display:block;white-space:pre-wrap}
+.field-row small{display:block;color:var(--muted);font-size:10px;line-height:1.6;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+.field-row input{font-size:13px}
+.field-row textarea{font-size:12px}
+.empty{color:var(--muted);font-size:13px;padding:30px 0}
+
+.preview-column{position:sticky;top:100px;min-width:0}
+.preview-heading{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:2px 0 12px}
+.preview-heading>span{font-size:10px;color:#84959f}
+.live-dot{display:inline-block;width:7px;height:7px;background:#3c9b82;border-radius:50%;margin-right:8px}
+.preview-location{font-size:11px;color:var(--muted);margin-bottom:12px;min-height:18px;overflow-wrap:anywhere}
+.preview-stage{background:linear-gradient(140deg,#e5edee,#d9e5e4);border:1px solid #d2dedf;border-radius:13px;padding:15px 12px 18px;overflow:hidden}
+.desktop-label{font-size:10px;color:#71898d;margin-bottom:12px;letter-spacing:.3px}
+.menu-panels{display:flex;align-items:flex-start;gap:7px;overflow-x:auto;min-height:240px;padding:0 2px 5px}
+.native-menu{background:#fbfcfdef;border:1px solid #c7d1d6;border-radius:9px;padding:6px;box-shadow:0 8px 20px #294d5d17;flex:0 0 230px;max-height:calc(100vh - 330px);overflow-y:auto;position:relative}
+.native-menu:not(:first-child){flex-basis:195px}
+.menu-row{display:flex;align-items:center;gap:7px;width:100%;min-height:28px;border:0;border-radius:4px;background:transparent;padding:5px 9px;font-size:11px;color:#2d414b;text-align:left;justify-content:flex-start}
+.menu-row .menu-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;line-height:1.65}
+.menu-row .arrow{margin-left:auto;color:#87969e}
+.menu-row.selected{background:#e0e9ed}
+.menu-row.highlight{background:#d7eee6;color:#124d44;box-shadow:inset 3px 0 #25836b}
+.menu-row.brand-row{font-weight:600;color:#667d87;cursor:default}
+.native-menu hr{border:0;border-top:1px solid #e0e6e9;margin:5px}
+.translated-highlight{background:#b9e4d6;color:#154d3e;border-radius:3px;padding:1px 2px;box-decoration-break:clone}
+.context-preview{margin-top:13px}
+.context-card{background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 5px 15px #28485809;overflow:hidden}
+.window-title{background:#f8fafb;border-bottom:1px solid #e5ecef;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#536974}
+.window-close{color:#93a2aa}
+.dialog-content{padding:17px;font-size:12px;line-height:1.7;overflow-wrap:anywhere;white-space:pre-wrap}
+.dialog-content p{margin:0 0 12px}
+.dialog-content p:last-child{margin:0}
+.dialog-buttons{display:flex;gap:8px;flex-wrap:wrap;padding:0 17px 16px;justify-content:flex-end}
+.dialog-button{border:1px solid #c9d5dc;padding:6px 12px;border-radius:5px;font-size:11px;background:#fafcfd}
+.alarm-example{background:#dff7f5;padding:18px}
+.alarm-time{text-align:center;font-size:25px;font-weight:500;letter-spacing:5px;color:#3d5960;margin-bottom:15px}
+.alarm-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center;font-size:12px;color:#41616a}
+.alarm-week>span{padding:8px 0;border-radius:20px;background:#f7fdfc;overflow:hidden}
+.alarm-week>span:first-child{color:#c54747}
+.alarm-week>span:last-child{color:#3679ae}
+.file-example{padding:16px}
+.file-path{background:#f4f7f9;border:1px solid #dfe6e9;border-radius:4px;padding:7px 10px;font-size:11px;color:var(--muted);margin-bottom:12px}
+.file-example .file-list{border:1px solid #e0e8eb;padding:13px;margin-bottom:12px;font-size:11px;color:#5e7984}
+.file-filter{border:1px solid #d5dfe3;padding:8px 10px;border-radius:5px;font-size:11px;white-space:pre-wrap;line-height:1.8}
+.preview-note{font-size:10px;line-height:1.8;color:#7b8f99;margin:12px 3px}
+.source-location{font-size:10px;color:#8c9ea8;padding:9px 14px;border-top:1px solid #edf1f3;overflow-wrap:anywhere}
+.context-label{font-size:10px;color:#7c919b;margin:0 0 7px}
+footer{text-align:center;color:#8a9ba5;font-size:11px;margin-top:25px;padding:15px}
+
+#language-action{width:min(460px,calc(100vw - 32px));padding:0;border:1px solid var(--line);border-radius:14px;color:inherit;box-shadow:0 20px 60px #183b4933}
+#language-action::backdrop{background:#18323d66;backdrop-filter:blur(3px)}
+#language-action form{padding:26px;position:relative}
+#upload-title{margin:0 25px 10px 0;font-size:18px;line-height:1.5}
+.upload-close{position:absolute;top:14px;right:14px;padding:0;width:28px;height:28px;font-size:20px;border:0}
+.upload-file{font-size:12px;line-height:1.7;color:var(--muted);overflow-wrap:anywhere;margin:0 0 20px}
+.upload-options{display:grid;gap:10px}
+.upload-option{display:block;padding:15px;text-align:left;white-space:normal}
+.upload-option strong{display:block;font-size:13px;margin-bottom:6px}
+.upload-option small{display:block;font-size:11px;line-height:1.7;color:var(--muted)}
+
+@media(min-width:1500px){.native-menu{flex-basis:255px}
+.native-menu:not(:first-child){flex-basis:220px}
+}
+@media(max-width:1000px){main{padding:24px}
+.workspace{gap:18px;grid-template-columns:minmax(300px,1fr) minmax(320px,1fr)}
+.translation-panel{padding:20px}
+.field-row,.column-labels{gap:12px}
+.topbar{padding:14px 24px}
+.native-menu{flex-basis:210px}
+.top-actions>span{display:none}
+.intro p{max-width:650px}
+}
+@media(max-width:720px){.workspace{display:flex;flex-direction:column}
+.translation-panel,.preview-column{width:100%}
+.preview-column{position:static}
+.metadata-grid{grid-template-columns:1fr}
+.load-bar{gap:12px}
+.load-actions{margin-left:0}
+.topbar{padding:12px 16px;flex-wrap:wrap;gap:12px}
+.top-actions{gap:12px;flex-wrap:wrap}
+main{padding:23px 16px}
+.brand-mark{display:none}
+h1{font-size:25px}
+.native-menu{max-height:430px}
+.field-row{grid-template-columns:1fr;gap:9px}
+.column-labels{display:none}
+.preview-heading{margin-top:8px}
+}
+
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">◷</span><div><strong>Skea Clock</strong><span data-ui="editorTitle">언어 만들기</span></div></div>
+    <div class="top-actions">
+      <div class="ui-language" role="group" aria-label="편집기 표시 언어" data-ui-label="uiLanguage">
+        <button type="button" data-ui-lang="ko" lang="ko" aria-pressed="true">KOR</button>
+        <button type="button" data-ui-lang="en" lang="en" aria-pressed="false">ENG</button>
+      </div>
+      <span id="progress" aria-live="polite"></span><button id="download" class="primary" data-ui="download" disabled>언어 파일 내려받기 ↓</button>
+    </div>
+  </header>
+  <main>
+    <section class="intro">
+      <div class="eyebrow">LANGUAGE EDITOR</div>
+      <h1 data-ui="heading">한 문장씩, 새로운 언어로.</h1>
+      <p data-ui="intro">원문을 보며 번역을 입력해 주세요. 항목에 마우스를 올리거나 입력하면 오른쪽에서 표시 위치를 보여드립니다.</p>
+    </section>
+    <section id="drop-zone" class="load-bar" aria-label="참고 언어 설정 및 파일 업로드" data-ui-label="referenceArea">
+      <div class="reference-header"><span data-ui="references">참고 언어</span><div id="reference-list" class="reference-list" role="list" aria-label="참고 언어 목록" data-ui-label="referenceList"></div></div>
+      <div class="load-actions"><button id="upload" type="button" data-ui="upload">언어 파일 업로드</button><input id="language-files" type="file" accept=".h" multiple hidden></div>
+      <p class="drop-hint" data-ui="dropHint">언어 파일(.h)을 올리면 편집할지 참고 언어로 추가할지 선택할 수 있습니다. 파일을 이 페이지에 끌어놓아도 됩니다.</p>
+      <p id="load-status" role="status">한국어 원문을 준비하고 있습니다.</p>
+    </section>
+    <div class="workspace">
+      <section class="translation-panel" aria-label="번역 입력" data-ui-label="translationArea">
+        <div class="section-title"><span class="step">01</span><div><h2 data-ui="languageInfo">언어 정보</h2><p data-ui="languageInfoHint">언어 메뉴에 표시할 이름을 직접 정해 주세요.</p></div></div>
+        <div class="metadata-grid">
+          <label><span data-ui="displayName">표시 이름</span><input id="nativeName" placeholder="예: Français" data-ui-placeholder="nameExample" maxlength="80" autocomplete="off" data-field="nativeName"></label>
+          <label><span data-ui="languageCode">언어 코드</span><input id="languageCode" placeholder="예: fr 또는 pt-BR" data-ui-placeholder="codeExample" maxlength="15" autocomplete="off" spellcheck="false" data-field="languageCode"></label>
+        </div>
+        <p class="hint" data-ui="metadataHint">표시 이름은 해당 언어의 고유 표기를 권합니다. 언어 코드는 영문과 숫자, 하이픈으로 작성해 주세요.</p>
+        <div class="section-title translation-title"><span class="step">02</span><div><h2 data-ui="translations">문구 번역</h2><p data-ui="translationsHint">입력하지 않은 항목은 빈칸으로 저장되며, 앱과 미리보기에서는 한국어로 표시됩니다. 입력 내용은 이 브라우저에 자동 저장됩니다.</p></div></div>
+        <div class="column-labels"><span data-ui="referenceText">참고 문구</span><span data-ui="targetText">새 언어로 입력</span></div>
+        <div id="fields"></div>
+      </section>
+      <aside class="preview-column" aria-label="화면 미리보기" data-ui-label="previewArea">
+        <div class="preview-heading"><div><span class="live-dot"></span><strong data-ui="previewTitle">표시 위치 미리보기</strong></div><span data-ui="livePreview">입력 즉시 반영</span></div>
+        <div id="preview-location" class="preview-location"></div>
+        <div class="preview-stage"><div class="desktop-label" data-ui="desktopLabel">Skea Clock · 설정 메뉴</div><div id="menu-preview" class="menu-panels"></div></div>
+        <div id="context-preview" class="context-preview"></div>
+        <p class="preview-note" data-ui="previewNote">메뉴 순서와 하위 메뉴는 앱 소스에서 생성합니다. 알람 시간·파일·디스플레이 값은 예시입니다.</p>
+      </aside>
+    </div>
+    <footer data-ui="applyHint">내려받은 파일은 앱의 우클릭 메뉴 → Language → 언어 파일 선택에서 적용할 수 있습니다.</footer>
+  </main>
+  <dialog id="language-action" aria-labelledby="upload-title" aria-describedby="upload-file">
+    <form method="dialog">
+      <button class="upload-close" value="cancel" aria-label="취소" data-ui-label="cancel">×</button>
+      <h2 id="upload-title" data-ui="uploadTitle">언어 파일을 어떻게 사용할까요?</h2>
+      <p id="upload-file" class="upload-file"></p>
+      <div class="upload-options">
+        <button class="upload-option" value="edit"><strong data-ui="editLanguage">언어 파일 편집</strong><small data-ui="editHint">언어 이름·코드와 모든 입력란을 이 파일의 내용으로 교체합니다.</small></button>
+        <button class="upload-option" value="reference"><strong data-ui="addReference">참고 언어로 추가</strong><small data-ui="referenceHint">현재 입력 내용은 유지하고, 한국어와 함께 번역을 표시합니다.</small></button>
+      </div>
+    </form>
+  </dialog>
+  <script>
+  'use strict';
+  const MODEL = {"fields": [{"key": "languageCode", "count": 0}, {"key": "nativeName", "count": 0}, {"key": "languageFileChoose", "count": 0}, {"key": "languageFileTitle", "count": 0}, {"key": "languageFileFilter", "count": 0}, {"key": "languageFileError", "count": 0}, {"key": "background", "count": 0}, {"key": "ticks", "count": 0}, {"key": "numbers", "count": 0}, {"key": "alarmAdd", "count": 0}, {"key": "alarmEdit", "count": 0}, {"key": "alarmDelete", "count": 0}, {"key": "effectVolume", "count": 0}, {"key": "alarmFileChoose", "count": 0}, {"key": "alarmDefault", "count": 0}, {"key": "volume", "count": 0}, {"key": "alarmSound", "count": 0}, {"key": "alwaysOnTop", "count": 0}, {"key": "topmostExceptions", "count": 0}, {"key": "noPrograms", "count": 0}, {"key": "programChoose", "count": 0}, {"key": "runAtStartup", "count": 0}, {"key": "startupError", "count": 0}, {"key": "taskbar", "count": 0}, {"key": "layout", "count": 0}, {"key": "displaySelect", "count": 0}, {"key": "displayPrefix", "count": 0}, {"key": "displayPrimary", "count": 0}, {"key": "exit", "count": 0}, {"key": "autoUpdateCheck", "count": 0}, {"key": "githubVisit", "count": 0}, {"key": "updateAvailable", "count": 0}, {"key": "updateVisitGithub", "count": 0}, {"key": "updateIgnore", "count": 0}, {"key": "updateCancel", "count": 0}, {"key": "alarmDays", "count": 7}, {"key": "alarmNoDays", "count": 0}, {"key": "alarmFileFilter", "count": 0}, {"key": "alarmFileTitle", "count": 0}, {"key": "programFileFilter", "count": 0}, {"key": "programFileTitle", "count": 0}, {"key": "mediaPackMissing", "count": 0}, {"key": "alarmFileError", "count": 0}, {"key": "artworkLoadError", "count": 0}, {"key": "artworkLoadHelp", "count": 0}, {"key": "standaloneArtworkLoadHelp", "count": 0}, {"key": "clockWindowError", "count": 0}, {"key": "standaloneDataError", "count": 0}], "menu": [{"source": "skea-clock.cpp:465", "keys": [], "kind": "fixed", "text": "Skea clock", "command": "0"}, {"source": "skea-clock.cpp:466", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:467", "keys": ["background"], "kind": "field", "key": "background", "command": "Background"}, {"source": "skea-clock.cpp:468", "keys": ["ticks"], "kind": "field", "key": "ticks", "command": "Ticks"}, {"source": "skea-clock.cpp:469", "keys": ["numbers"], "kind": "field", "key": "numbers", "command": "Numbers"}, {"source": "skea-clock.cpp:470", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:471", "keys": ["alarmAdd"], "kind": "field", "key": "alarmAdd", "command": "AlarmAddCommand"}, {"source": "skea-clock.cpp:477", "keys": ["alarmDays", "alarmNoDays"], "kind": "alarm", "command": "reinterpret_cast", "children": [{"source": "skea-clock.cpp:475", "keys": ["alarmEdit"], "kind": "field", "key": "alarmEdit", "command": "AlarmEditFirst"}, {"source": "skea-clock.cpp:476", "keys": ["alarmDelete"], "kind": "field", "key": "alarmDelete", "command": "AlarmDeleteFirst"}]}, {"source": "skea-clock.cpp:479", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:442", "keys": ["effectVolume"], "kind": "field", "key": "effectVolume", "command": "reinterpret_cast", "children": [{"kind": "fixed", "text": "0%", "keys": []}, {"kind": "fixed", "text": "10%", "keys": []}, {"kind": "fixed", "text": "20%", "keys": []}, {"kind": "fixed", "text": "30%", "keys": []}, {"kind": "fixed", "text": "40%", "keys": []}, {"kind": "fixed", "text": "50%", "keys": []}, {"kind": "fixed", "text": "60%", "keys": []}, {"kind": "fixed", "text": "70%", "keys": []}, {"kind": "fixed", "text": "80%", "keys": []}, {"kind": "fixed", "text": "90%", "keys": []}, {"kind": "fixed", "text": "100%", "keys": []}]}, {"source": "skea-clock.cpp:456", "keys": ["alarmSound"], "kind": "field", "key": "alarmSound", "command": "reinterpret_cast", "children": [{"source": "skea-clock.cpp:445", "keys": ["alarmFileChoose"], "kind": "field", "key": "alarmFileChoose", "command": "AlarmFileChoose"}, {"source": "skea-clock.cpp:448", "keys": [], "kind": "dynamic", "command": "AlarmSoundCustom"}, {"source": "skea-clock.cpp:451", "keys": ["alarmDefault"], "kind": "field", "key": "alarmDefault", "command": "AlarmSoundDefault"}, {"source": "skea-clock.cpp:453", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:455", "keys": ["volume"], "kind": "field", "key": "volume", "command": "reinterpret_cast", "children": [{"kind": "fixed", "text": "0%", "keys": []}, {"kind": "fixed", "text": "10%", "keys": []}, {"kind": "fixed", "text": "20%", "keys": []}, {"kind": "fixed", "text": "30%", "keys": []}, {"kind": "fixed", "text": "40%", "keys": []}, {"kind": "fixed", "text": "50%", "keys": []}, {"kind": "fixed", "text": "60%", "keys": []}, {"kind": "fixed", "text": "70%", "keys": []}, {"kind": "fixed", "text": "80%", "keys": []}, {"kind": "fixed", "text": "90%", "keys": []}, {"kind": "fixed", "text": "100%", "keys": []}]}]}, {"source": "skea-clock.cpp:481", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:482", "keys": ["alwaysOnTop"], "kind": "field", "key": "alwaysOnTop", "command": "AlwaysOnTop"}, {"source": "clock-exception-menu.h:93", "keys": ["topmostExceptions"], "kind": "field", "key": "topmostExceptions", "command": "reinterpret_cast", "children": [{"source": "clock-exception-menu.h:90", "keys": ["noPrograms"], "kind": "field", "key": "noPrograms", "command": "0"}, {"source": "clock-exception-menu.h:91", "keys": [], "kind": "separator", "command": "0"}, {"source": "clock-exception-menu.h:92", "keys": ["programChoose"], "kind": "field", "key": "programChoose", "command": "TopmostExceptionAdd"}]}, {"source": "skea-clock.cpp:484", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:485", "keys": ["runAtStartup"], "kind": "field", "key": "runAtStartup", "command": "RunAtStartup"}, {"source": "skea-clock.cpp:486", "keys": ["taskbar"], "kind": "field", "key": "taskbar", "command": "Taskbar"}, {"source": "skea-clock.cpp:487", "keys": ["layout"], "kind": "field", "key": "layout", "command": "EditLayout"}, {"source": "skea-clock.cpp:495", "keys": ["displaySelect"], "kind": "field", "key": "displaySelect", "command": "reinterpret_cast", "children": [{"source": "skea-clock.cpp:493", "keys": ["displayPrefix", "displayPrimary"], "kind": "display", "command": "DisplayFirst"}]}, {"source": "skea-clock.cpp:498", "keys": [], "kind": "fixed", "text": "Language", "command": "reinterpret_cast", "children": [{"source": "clock-language-menu.h:84", "keys": [], "kind": "languages", "command": "command"}, {"source": "clock-language-menu.h:88", "keys": ["nativeName", "languageCode"], "kind": "custom-language", "command": "LanguageCustom"}, {"source": "clock-language-menu.h:89", "keys": [], "kind": "separator", "command": "0"}, {"source": "clock-language-menu.h:90", "keys": ["languageFileChoose"], "kind": "field", "key": "languageFileChoose", "command": "LanguageFileChoose"}]}, {"source": "skea-clock.cpp:500", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:501", "keys": ["autoUpdateCheck"], "kind": "field", "key": "autoUpdateCheck", "command": "AutoUpdateCheck"}, {"source": "skea-clock.cpp:502", "keys": ["githubVisit"], "kind": "field", "key": "githubVisit", "command": "GithubVisit"}, {"source": "skea-clock.cpp:504", "keys": [], "kind": "separator", "command": "0"}, {"source": "skea-clock.cpp:505", "keys": ["exit"], "kind": "field", "key": "exit", "command": "Exit"}], "contexts": [{"kind": "file", "keys": ["languageFileTitle", "languageFileFilter"], "title": "languageFileTitle", "filter": "languageFileFilter", "source": "clock-language-menu.h:58"}, {"kind": "file", "keys": ["alarmFileTitle", "alarmFileFilter"], "title": "alarmFileTitle", "filter": "alarmFileFilter", "source": "clock-sound.h:117"}, {"kind": "dialog", "keys": ["updateVisitGithub", "updateIgnore", "updateCancel", "updateAvailable"], "buttons": ["updateVisitGithub", "updateIgnore", "updateCancel"], "source": "clock-update-check.h:44"}, {"kind": "file", "keys": ["programFileTitle", "programFileFilter"], "title": "programFileTitle", "filter": "programFileFilter", "source": "clock-window-behavior.h:273"}, {"kind": "dialog", "keys": ["startupError"], "buttons": [], "source": "skea-clock.cpp:799"}, {"kind": "dialog", "keys": ["artworkLoadError", "artworkLoadHelp"], "buttons": [], "source": "skea-clock.cpp:870"}, {"kind": "dialog", "keys": ["clockWindowError"], "buttons": [], "source": "skea-clock.cpp:906"}, {"kind": "dialog", "keys": ["mediaPackMissing", "alarmFileError"], "buttons": [], "source": "clock-alarm-validation.h:43"}, {"kind": "dialog", "keys": ["languageFileError"], "buttons": [], "source": "clock-language-menu.h:21"}, {"kind": "dialog", "keys": ["standaloneDataError"], "buttons": [], "source": "distribution/build.ps1:67"}, {"kind": "alarm", "keys": ["alarmAdd", "alarmDays"], "source": "alarm-editor.h:202"}, {"kind": "dialog", "keys": ["artworkLoadError", "standaloneArtworkLoadHelp"], "buttons": [], "source": "skea-clock.cpp:870"}], "uses": {"displayPrefix": ["skea-clock.cpp:75"], "displayPrimary": ["skea-clock.cpp:77"], "effectVolume": ["skea-clock.cpp:442"], "alarmFileChoose": ["skea-clock.cpp:445"], "alarmDefault": ["skea-clock.cpp:452"], "volume": ["skea-clock.cpp:455"], "alarmSound": ["skea-clock.cpp:456"], "background": ["skea-clock.cpp:467"], "ticks": ["skea-clock.cpp:468"], "numbers": ["skea-clock.cpp:469"], "alarmAdd": ["skea-clock.cpp:471", "skea-clock.cpp:785", "alarm-editor.h:377"], "alarmEdit": ["skea-clock.cpp:475"], "alarmDelete": ["skea-clock.cpp:476"], "alwaysOnTop": ["skea-clock.cpp:482"], "runAtStartup": ["skea-clock.cpp:485"], "taskbar": ["skea-clock.cpp:486"], "layout": ["skea-clock.cpp:487"], "displaySelect": ["skea-clock.cpp:496"], "autoUpdateCheck": ["skea-clock.cpp:501"], "githubVisit": ["skea-clock.cpp:502"], "exit": ["skea-clock.cpp:505"], "startupError": ["skea-clock.cpp:799"], "artworkLoadError": ["skea-clock.cpp:869"], "artworkLoadHelp": ["skea-clock.cpp:869", "distribution/build.ps1:80"], "clockWindowError": ["skea-clock.cpp:906"], "alarmDays": ["alarm-editor-font.h:71", "alarm-editor.h:33"], "alarmNoDays": ["alarm-editor.h:41"], "mediaPackMissing": ["clock-alarm-validation.h:41"], "alarmFileError": ["clock-alarm-validation.h:42"], "noPrograms": ["clock-exception-menu.h:90"], "programChoose": ["clock-exception-menu.h:92"], "topmostExceptions": ["clock-exception-menu.h:93"], "languageFileError": ["clock-language-menu.h:20"], "languageFileFilter": ["clock-language-menu.h:62"], "languageFileTitle": ["clock-language-menu.h:65"], "languageFileChoose": ["clock-language-menu.h:90"], "alarmFileFilter": ["clock-sound.h:121"], "alarmFileTitle": ["clock-sound.h:124"], "updateVisitGithub": ["clock-update-check.h:55"], "updateIgnore": ["clock-update-check.h:56"], "updateCancel": ["clock-update-check.h:57"], "updateAvailable": ["clock-update-check.h:65"], "programFileFilter": ["clock-window-behavior.h:277"], "programFileTitle": ["clock-window-behavior.h:280"], "standaloneDataError": ["distribution/build.ps1:67"], "standaloneArtworkLoadHelp": ["distribution/build.ps1:80"]}};
+  const KOREAN_SOURCE = "#pragma once\n\nconst UiStrings KoreanStrings = [] {\n    UiStrings text = {};\n    text.languageCode = L\"ko\";\n    text.nativeName = L\"\ud55c\uad6d\uc5b4\";\n    text.languageFileChoose = L\"\uc5b8\uc5b4 \ud30c\uc77c \uc120\ud0dd...\";\n    text.languageFileTitle = L\"\uc5b8\uc5b4 \ud30c\uc77c \uc120\ud0dd\";\n    text.languageFileFilter = L\"\uc5b8\uc5b4 \ud30c\uc77c\\0*.h\\0\ubaa8\ub4e0 \ud30c\uc77c\\0*.*\\0\\0\";\n    text.languageFileError = L\"\uc5b8\uc5b4 \ud30c\uc77c\uc744 \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \ud30c\uc77c\uc774 \uc874\uc7ac\ud558\ub294\uc9c0\uc640 \uc62c\ubc14\ub978 \uc5b8\uc5b4 \ud30c\uc77c \ud615\uc2dd\uc778\uc9c0 \ud655\uc778\ud574 \uc8fc\uc138\uc694.\";\n    text.background = L\"\ubc30\uacbd \ud45c\uc2dc\";\n    text.ticks = L\"\ub208\uae08 \ud45c\uc2dc\";\n    text.numbers = L\"\uc22b\uc790 \ud45c\uc2dc\";\n    text.alarmAdd = L\"\uc54c\ub78c \ucd94\uac00\";\n    text.alarmEdit = L\"\uc54c\ub78c \ud3b8\uc9d1\";\n    text.alarmDelete = L\"\uc54c\ub78c \uc0ad\uc81c\";\n    text.effectVolume = L\"\ud6a8\uacfc\uc74c \ud06c\uae30 \uc870\uc808\";\n    text.alarmFileChoose = L\"\uc54c\ub78c \ud30c\uc77c \uc120\ud0dd...\";\n    text.alarmDefault = L\"\uae30\ubcf8 \uc54c\ub78c\";\n    text.volume = L\"\ud06c\uae30 \uc870\uc808\";\n    text.alarmSound = L\"\uc54c\ub78c \uc18c\ub9ac \uc870\uc808\";\n    text.alwaysOnTop = L\"\ud56d\uc0c1 \uc704\uc5d0 \ud45c\uc2dc\";\n    text.topmostExceptions = L\"\ucd5c\uc0c1\ub2e8 \uace0\uc815 \uc608\uc678\";\n    text.noPrograms = L\"(\ud504\ub85c\uadf8\ub7a8 \uc5c6\uc74c)\";\n    text.programChoose = L\"\ud504\ub85c\uadf8\ub7a8 \uc120\ud0dd...\";\n    text.runAtStartup = L\"\uc2dc\uc791 \uc2dc \uc790\ub3d9 \uc2e4\ud589\";\n    text.startupError = L\"\uc2dc\uc791 \ud504\ub85c\uadf8\ub7a8 \uc124\uc815\uc744 \ubcc0\uacbd\ud558\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \uc2e4\ud589 \ud30c\uc77c \uacbd\ub85c \uae38\uc774\uc640 \ub808\uc9c0\uc2a4\ud2b8\ub9ac \uc811\uadfc \uad8c\ud55c\uc744 \ud655\uc778\ud574 \uc8fc\uc138\uc694.\";\n    text.taskbar = L\"\uc791\uc5c5 \ud45c\uc2dc\uc904 \ud45c\uc2dc\";\n    text.layout = L\"\ud06c\uae30\u00b7\uc704\uce58 \uc774\ub3d9\";\n    text.displaySelect = L\"\ud45c\uc2dc \ub514\uc2a4\ud50c\ub808\uc774\";\n    text.displayPrefix = L\"\ub514\uc2a4\ud50c\ub808\uc774 \";\n    text.displayPrimary = L\" \u00b7 \uae30\ubcf8\";\n    text.exit = L\"\uc885\ub8cc\";\n    text.autoUpdateCheck = L\"\uc5c5\ub370\uc774\ud2b8 \uc790\ub3d9 \uccb4\ud06c\";\n    text.githubVisit = L\"Github \ubc29\ubb38\";\n    text.updateAvailable = L\"\ucd5c\uc2e0 \uc5c5\ub370\uc774\ud2b8\uac00 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\uc6b4\ubc1b\uc73c\uc2dc\uaca0\uc2b5\ub2c8\uae4c?\";\n    text.updateVisitGithub = L\"Github \ud398\uc774\uc9c0 \ubc29\ubb38\";\n    text.updateIgnore = L\"\uc774\ubc88 \uc5c5\ub370\uc774\ud2b8 \ubb34\uc2dc\";\n    text.updateCancel = L\"\ucde8\uc18c\";\n    text.alarmDays = {\n        L\"\uc77c\",\n        L\"\uc6d4\",\n        L\"\ud654\",\n        L\"\uc218\",\n        L\"\ubaa9\",\n        L\"\uae08\",\n        L\"\ud1a0\",\n    };\n    text.alarmNoDays = L\"\uc694\uc77c \uc5c6\uc74c\";\n    text.alarmFileFilter =\n        L\"\uc9c0\uc6d0\ub418\ub294 \ubbf8\ub514\uc5b4\\0*.wav;*.mp3;*.m4a;*.aac;*.flac;*.wma;*.mp4;*.m4v;*.mov;*.wmv\\0\"\n        L\"\uc624\ub514\uc624 \ud30c\uc77c\\0*.wav;*.mp3;*.m4a;*.aac;*.flac;*.wma\\0\"\n        L\"\ub3d9\uc601\uc0c1 \ud30c\uc77c\\0*.mp4;*.m4v;*.mov;*.wmv\\0\\0\";\n    text.alarmFileTitle = L\"\uc54c\ub78c \uc18c\ub9ac \ud30c\uc77c \uc120\ud0dd\";\n    text.programFileFilter = L\"\ud504\ub85c\uadf8\ub7a8\\0*.exe\\0\ubaa8\ub4e0 \ud30c\uc77c\\0*.*\\0\\0\";\n    text.programFileTitle = L\"\ucd5c\uc0c1\ub2e8 \uace0\uc815 \uc608\uc678 \ud504\ub85c\uadf8\ub7a8 \uc120\ud0dd\";\n    text.mediaPackMissing = L\"\uc708\ub3c4\uc6b0 \ubbf8\ub514\uc5b4 \ud329\uc774 \uc5c6\uc2b5\ub2c8\ub2e4. \uc815\uc0c1\uc801\uc73c\ub85c \ub3d9\uc791\ud558\uc9c0 \uc54a\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.\";\n    text.alarmFileError = L\"\uc120\ud0dd\ud55c \uc54c\ub78c \ud30c\uc77c \uc2e4\ud589 \ub3c4\uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4\";\n    text.artworkLoadError = L\"PNG \uc560\ub2c8\uba54\uc774\uc158, \ubc14\ub298 \uc774\ubbf8\uc9c0 \ub610\ub294 locate data\uc758 \uc88c\ud45c \uc124\uc815\uc744 \ubd88\ub7ec\uc624\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4.\";\n    text.artworkLoadHelp = L\"build.cmd\ub97c \ub2e4\uc2dc \uc2e4\ud589\ud558\uace0, bin \ud3f4\ub354\uc640 sources \ud3f4\ub354\ub97c \ud568\uaed8 \ubcf4\uad00\ud574 \uc8fc\uc138\uc694.\";\n    text.standaloneArtworkLoadHelp = L\"\ubc30\ud3ec\uc6a9 EXE\ub97c \ub2e4\uc2dc \ubc1b\uac70\ub098 \uc0ac\uc6a9\uc790 \ub370\uc774\ud130 \ud3f4\ub354\uc758 assets \ud3f4\ub354\ub97c \uc9c0\uc6b4 \ub4a4 \ub2e4\uc2dc \uc2e4\ud589\ud574 \uc8fc\uc138\uc694.\";\n    text.clockWindowError = L\"\uc2dc\uacc4 \ucc3d\uc744 \ub9cc\ub4e4\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4.\";\n    text.standaloneDataError = L\"LocalAppData\uc5d0 SkeaClock \ub370\uc774\ud130\ub97c \uc900\ube44\ud558\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4. \ub514\uc2a4\ud06c \uc5ec\uc720 \uacf5\uac04\uacfc \ud3f4\ub354 \uad8c\ud55c\uc744 \ud655\uc778\ud574 \uc8fc\uc138\uc694.\";\n    return text;\n}();\n";
+  const UI_TEXT = {
+  pageTitle: ['Skea Clock · 언어 만들기', 'Skea Clock · Language Editor'],
+  editorTitle: ['언어 만들기', 'Language Editor'],
+  uiLanguage: ['편집기 표시 언어', 'Editor interface language'],
+  download: ['언어 파일 내려받기 ↓', 'Download language file ↓'],
+  heading: ['한 문장씩, 새로운 언어로.', 'A new language, one phrase at a time.'],
+  intro: ['원문을 보며 번역을 입력해 주세요. 항목에 마우스를 올리거나 입력하면 오른쪽에서 표시 위치를 보여드립니다.', 'Enter translations beside the source text. Hover over a field or type in it to see where it appears on the right.'],
+  referenceArea: ['참고 언어 설정 및 파일 업로드', 'Reference languages and file uploads'],
+  references: ['참고 언어', 'Reference languages'],
+  referenceList: ['참고 언어 목록', 'Reference language list'],
+  upload: ['언어 파일 업로드', 'Upload language files'],
+  dropHint: ['언어 파일(.h)을 올리면 편집할지 참고 언어로 추가할지 선택할 수 있습니다. 파일을 이 페이지에 끌어놓아도 됩니다.', 'Upload language files (.h), then choose to edit them or add them as references. You can also drag and drop files onto this page.'],
+  translationArea: ['번역 입력', 'Translation inputs'],
+  languageInfo: ['언어 정보', 'Language details'],
+  languageInfoHint: ['언어 메뉴에 표시할 이름을 직접 정해 주세요.', 'Choose the name shown in the app’s Language menu.'],
+  displayName: ['표시 이름', 'Display name'],
+  languageCode: ['언어 코드', 'Language code'],
+  nameExample: ['예: Français', 'e.g. Français'],
+  codeExample: ['예: fr 또는 pt-BR', 'e.g. fr or pt-BR'],
+  metadataHint: ['표시 이름은 해당 언어의 고유 표기를 권합니다. 언어 코드는 영문과 숫자, 하이픈으로 작성해 주세요.', 'Use the language’s own name where possible. Language codes use Latin letters, digits, and hyphens.'],
+  translations: ['문구 번역', 'Translate phrases'],
+  translationsHint: ['입력하지 않은 항목은 빈칸으로 저장되며, 앱과 미리보기에서는 한국어로 표시됩니다. 입력 내용은 이 브라우저에 자동 저장됩니다.', 'Unfilled fields are saved as blank; the app and preview use Korean for them. Your inputs are saved automatically in this browser.'],
+  referenceText: ['참고 문구', 'Reference text'],
+  targetText: ['새 언어로 입력', 'Your translation'],
+  previewArea: ['화면 미리보기', 'Interface preview'],
+  previewTitle: ['표시 위치 미리보기', 'Preview phrase locations'],
+  livePreview: ['입력 즉시 반영', 'Updates as you type'],
+  chooseField: ['번역할 항목을 선택해 주세요', 'Select a field to translate'],
+  desktopLabel: ['Skea Clock · 설정 메뉴', 'Skea Clock · Settings menu'],
+  previewNote: ['메뉴 순서와 하위 메뉴는 앱 소스에서 생성합니다. 알람 시간·파일·디스플레이 값은 예시입니다.', 'Menu order and submenus are generated from the app source. Alarm times, files, and display details are examples.'],
+  applyHint: ['내려받은 파일은 앱의 우클릭 메뉴 → Language → 언어 파일 선택에서 적용할 수 있습니다.', 'Apply the downloaded file from the app’s right-click menu → Language → Choose language file…'],
+  cancel: ['취소', 'Cancel'],
+  uploadTitle: ['언어 파일을 어떻게 사용할까요?', 'How would you like to use this file?'],
+  editLanguage: ['언어 파일 편집', 'Edit language file'],
+  editHint: ['언어 이름·코드와 모든 입력란을 이 파일의 내용으로 교체합니다.', 'Replace the language name, code, and all translation inputs with this file’s contents.'],
+  addReference: ['참고 언어로 추가', 'Add as reference'],
+  referenceHint: ['현재 입력 내용은 유지하고, 한국어와 함께 번역을 표시합니다.', 'Keep your inputs and show this translation alongside Korean.'],
+  progress: ['{0} / {1} 항목 입력', '{0} / {1} fields filled'],
+  blankPlaceholder: ['빈칸으로 저장 · 앱에서는 한국어로 표시', 'Saved blank · Korean fallback in app'],
+  dayNote: ['각 요일은 3글자까지 입력할 수 있습니다. 빈칸은 앱에서 한국어로 표시됩니다.', 'Use up to 3 characters per weekday. Blank labels use Korean in the app.'],
+  sunday: ['일요일', 'Sunday'],
+  monday: ['월요일', 'Monday'],
+  tuesday: ['화요일', 'Tuesday'],
+  wednesday: ['수요일', 'Wednesday'],
+  thursday: ['목요일', 'Thursday'],
+  friday: ['금요일', 'Friday'],
+  saturday: ['토요일', 'Saturday'],
+  filterNote: ['파일 형식은 유지됩니다: {0}', 'File patterns are preserved: {0}'],
+  trailingSpace: ['마지막 공백도 번역 문구에 포함해 주세요.', 'Include the trailing space in your translation.'],
+  defaultReference: ['기본', 'Default'],
+  removeReference: ['{0} 참고 언어 제거', 'Remove {0} reference'],
+  referenceRemoved: ['{0}를 참고 언어에서 제거했습니다.', 'Removed {0} from references.'],
+  koreanInvalid: ['HTML에 포함된 한국어 원문을 읽지 못했습니다. 생성 코드를 다시 실행해 주세요.', 'Could not read the Korean source embedded in this HTML. Regenerate the editor.'],
+  sourceMismatch: ['한국어 원문의 {0} 형식이 편집기와 다릅니다. 생성 코드를 다시 실행해 주세요.', 'The Korean source format for {0} does not match the editor. Regenerate the editor.'],
+  koreanReady: ['한국어 원문이 기본으로 포함되어 있습니다. 파일을 올리지 않아도 바로 번역을 입력할 수 있습니다.', 'Korean source text is included. You can start translating without uploading a file.'],
+  generated: ['{0} 파일을 생성했습니다. 입력 내용은 계속 수정할 수 있습니다.', 'Created {0}. You can continue editing your inputs.'],
+  contextLabel: ['문구 미리보기', 'Phrase preview'],
+  dialogLocation: ['안내창에서 사용하는 문구입니다', 'This phrase appears in a dialog'],
+  autosaveError: ['브라우저 자동 저장을 사용할 수 없습니다. 작업을 마치면 언어 파일을 내려받아 주세요.', 'Browser autosave is unavailable. Download your language file when you finish.'],
+  selectFiles: ['언어 파일(.h)을 선택하거나 끌어놓아 주세요.', 'Choose or drop language files (.h).'],
+  notLanguage: ['{0}: 언어 파일 형식이 아닙니다.', '{0}: Not a language file.'],
+  koreanNotice: ['한국어는 내장된 기본 원문을 유지합니다.', 'The built-in Korean source is kept as the default reference.'],
+  uploadSummary: ['편집 {0}개 · 참고 언어 반영 {1}개.', 'Files edited: {0} · References added or updated: {1}.'],
+  unsupportedEscape: ['지원하지 않는 문자열 이스케이프: {0}', 'Unsupported string escape: {0}'],
+  duplicateField: ['{0}: {1} 항목이 중복되었습니다.', '{0}: Duplicate field: {1}.'],
+  missingMetadata: ['{0}: languageCode와 nativeName이 필요합니다.', '{0}: languageCode and nativeName are required.'],
+  invalidCode: ['{0}: 언어 코드 형식을 확인해 주세요.', '{0}: Check the language code format.'],
+  stringRequired: ['{0}: {1} 항목은 문자열이어야 합니다.', '{0}: {1} must be a string.'],
+  arraySize: ['{0}: {1}에는 최대 {2}개 항목을 각각 3글자까지 입력해 주세요.', '{0}: {1} accepts up to {2} entries, each up to 3 characters.'],
+  codeHint: ['언어 코드는 fr, pt-BR, zh-TW처럼 15자 이내로 입력해 주세요.', 'Use a language code of up to 15 characters, such as fr, pt-BR, or zh-TW.'],
+  nameHint: ['Language 메뉴에 표시할 이름을 80자 이내로 입력해 주세요.', 'Enter a display name of up to 80 characters for the Language menu.'],
+  dayLength: ['요일은 각각 3글자까지 입력해 주세요.', 'Use up to 3 characters for each weekday.'],
+  nullText: ['문구에 널 문자를 넣을 수 없습니다.', 'Phrases cannot contain null characters.'],
+  nameControl: ['언어 이름에는 줄바꿈이나 제어 문자를 넣을 수 없습니다.', 'Language names cannot contain line breaks or control characters.'],
+};
+
+let uiLanguage = 'ko';
+let statusMessage = null;
+
+function uiText(key, ...args) {
+  return UI_TEXT[key][uiLanguage === 'en' ? 1 : 0].replace(/\{(\d+)\}/g, (_, index) => args[index]);
+}
+
+function uiElement(tag, className, key, ...args) {
+  const node = element(tag, className, uiText(key, ...args));
+  node.dataset.ui = key;
+  node.uiArgs = args;
+  return node;
+}
+
+function translateUi() {
+  document.querySelectorAll('[data-ui], [data-ui-placeholder], [data-ui-label]').forEach(node => {
+    const args = node.uiArgs || [];
+    if (node.dataset.ui) node.textContent = uiText(node.dataset.ui, ...args);
+    if (node.dataset.uiPlaceholder) node.placeholder = uiText(node.dataset.uiPlaceholder, ...args);
+    if (node.dataset.uiLabel) node.setAttribute('aria-label', uiText(node.dataset.uiLabel, ...args));
+  });
+}
+
+function showStatus(message, error = false) {
+  statusMessage = message;
+  const status = document.getElementById('load-status');
+  status.textContent = message();
+  status.classList.toggle('error', error);
+}
+
+function uiError(key, ...args) {
+  const error = new Error(uiText(key, ...args));
+  error.localizedMessage = () => uiText(key, ...args);
+  return error;
+}
+
+function errorMessage(error) {
+  return error.localizedMessage ? error.localizedMessage() : error.message;
+}
+
+function setUiLanguage(language) {
+  uiLanguage = language;
+  document.documentElement.lang = language;
+  document.querySelectorAll('[data-ui-lang]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.uiLang === language));
+  });
+  translateUi();
+  if (statusMessage) document.getElementById('load-status').textContent = statusMessage();
+  if (state.base) {
+    progress();
+    renderPreview(true);
+  }
+}
+
+function decodeCppString(token) {
+  const body = token.replace(/^L?"/, '').slice(0, -1);
+  const simple = {'a':'\x07', 'b':'\b', 'f':'\f', 'n':'\n', 'r':'\r', 't':'\t', 'v':'\v', '"':'"', "'":"'", '?':'?', '\\':'\\'};
+  return body.replace(/\\(u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|x[0-9a-fA-F]+|[0-7]{1,3}|.)/gs, (_, escape) => {
+    if (/^[0-7]/.test(escape)) return String.fromCodePoint(parseInt(escape, 8));
+    if (/^[uUx]/.test(escape)) return String.fromCodePoint(parseInt(escape.slice(1), 16));
+    if (Object.hasOwn(simple, escape)) return simple[escape];
+    throw uiError('unsupportedEscape', '\\' + escape);
+  });
+}
+
+function parseLanguage(name, source) {
+  const tokens = (source.match(/\/\/[^\n]*|\/\*[\s\S]*?\*\/|L?"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[A-Za-z_]\w*|[^\s]/g) || [])
+    .filter(token => !/^\/[/*]/.test(token));
+  if (!tokens.some((token, index) => token === 'const' && tokens[index + 1] === 'UiStrings')) return null;
+  const values = {};
+  for (let i = 0; i < tokens.length - 4; i++) {
+    if (tokens[i] !== 'text' || tokens[i + 1] !== '.' || tokens[i + 3] !== '=') continue;
+    const key = tokens[i + 2];
+    const expression = [];
+    for (i += 4; i < tokens.length && tokens[i] !== ';'; i++) expression.push(tokens[i]);
+    if (Object.hasOwn(values, key)) throw uiError('duplicateField', name, key);
+    const strings = expression.filter(token => /^L?"/.test(token)).map(decodeCppString);
+    values[key] = expression[0] === '{' ? strings : strings.join('');
+  }
+  if (!values.languageCode || !values.nativeName) throw uiError('missingMetadata', name);
+  if (!/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/.test(values.languageCode) || values.languageCode.length > 15)
+    throw uiError('invalidCode', name);
+  for (const field of MODEL.fields) {
+    if (Object.hasOwn(values, field.key) && !field.count && typeof values[field.key] !== 'string')
+      throw uiError('stringRequired', name, field.key);
+    if (field.count && Object.hasOwn(values, field.key) &&
+        (!Array.isArray(values[field.key]) || values[field.key].length > field.count || values[field.key].some(value => value.length > 3)))
+      throw uiError('arraySize', name, field.key, field.count);
+  }
+  return {name, code:values.languageCode, nativeName:values.nativeName, values};
+}
+
+function filterPairs(value) {
+  const parts = value.split('\0');
+  const pairs = [];
+  for (let i = 0; i + 1 < parts.length && parts[i + 1]; i += 2) pairs.push({label:parts[i], pattern:parts[i + 1]});
+  return pairs;
+}
+
+function cppString(value) {
+  return 'L"' + value.replace(/[\\"\x00-\x1f\x7f]/g, character => {
+    if (character === '\\') return '\\\\';
+    if (character === '"') return '\\"';
+    if (character === '\n') return '\\n';
+    if (character === '\r') return '\\r';
+    if (character === '\t') return '\\t';
+    return '\\' + character.charCodeAt(0).toString(8).padStart(3, '0');
+  }) + '"';
+}
+
+function languageInputs(values) {
+  const inputs = {};
+  for (const field of MODEL.fields) {
+    const value = values[field.key];
+    if (value === undefined) continue;
+    if (field.count) value.forEach((label, index) => { inputs[`${field.key}:${index}`] = label; });
+    else if (value.includes('\0')) filterPairs(value).forEach((filter, index) => { inputs[`${field.key}:${index}`] = filter.label; });
+    else inputs[field.key] = value;
+  }
+  return inputs;
+}
+
+function makeLanguageHeader(getValue) {
+  const code = getValue('languageCode');
+  if (!/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/.test(code) || code.length > 15)
+    throw uiError('codeHint');
+  if (!getValue('nativeName').trim() || getValue('nativeName').length > 80)
+    throw uiError('nameHint');
+  const lines = ['#pragma once', '', `const UiStrings Language_${code.replaceAll('-', '_')}Strings = [] {`, '    UiStrings text = {};'];
+  for (const field of MODEL.fields) {
+    const value = getValue(field.key);
+    if (field.count) {
+      if (value.some(label => label.length > 3)) throw uiError('dayLength');
+      lines.push(`    text.${field.key} = {`, ...value.map(label => `        ${cppString(label)},`), '    };');
+    } else {
+      if (!field.key.endsWith('Filter') && value.includes('\0')) throw uiError('nullText');
+      if (field.key === 'nativeName' && /[\x00-\x1f\x7f]/.test(value)) throw uiError('nameControl');
+      lines.push(`    text.${field.key} = ${cppString(value)};`);
+    }
+  }
+  lines.push('    return text;', '}();', '');
+  return {name:`${code}.h`, content:'\ufeff' + lines.join('\r\n')};
+}
+
+function previewPiece(text, key, index = null) {
+  const active = state.active?.split(':');
+  const selected = active?.[0] === key && (index === null || Number(active[1]) === index);
+  return element('span', selected ? 'translated-highlight' : '', text);
+}
+
+function menuLabel(node) {
+  const label = element('span', 'menu-text');
+  if (node.kind === 'field') label.append(previewPiece(valueFor(node.key), node.key));
+  else if (node.kind === 'custom-language') label.append(previewPiece(valueFor('nativeName') || '새 언어', 'nativeName'));
+  else if (node.kind === 'fixed') label.textContent = node.text;
+  else if (node.kind === 'alarm') {
+    label.append(document.createTextNode('08:00 · '));
+    if (state.active === 'alarmNoDays') label.append(previewPiece(valueFor('alarmNoDays'), 'alarmNoDays'));
+    else valueFor('alarmDays').forEach((day, index) => {
+      if (index) label.append(document.createTextNode(' '));
+      label.append(previewPiece(day, 'alarmDays', index));
+    });
+  } else if (node.kind === 'display') {
+    label.append(previewPiece(valueFor('displayPrefix'), 'displayPrefix'), document.createTextNode('1  (1920 × 1080)'),
+      previewPiece(valueFor('displayPrimary'), 'displayPrimary'));
+  } else if (node.kind === 'file') label.textContent = 'alarm.wav';
+  else if (node.keys.length) node.keys.forEach(key => label.append(previewPiece(valueFor(key), key)));
+  else label.textContent = '예시 항목';
+  return label;
+}
+
+function findMenuPath(nodes, key, prefix = []) {
+  for (let index = 0; index < nodes.length; index++) {
+    const path = [...prefix, index];
+    const node = nodes[index];
+    const child = node.children && findMenuPath(node.children, key, path);
+    if (child) return child;
+    if (node.keys.includes(key)) return path;
+  }
+  return null;
+}
+
+function menuPanel(nodes, prefix) {
+  const panel = element('div', 'native-menu');
+  const activeKey = state.active?.split(':')[0];
+  nodes.forEach((node, index) => {
+    if (node.kind === 'separator') { panel.append(element('hr')); return; }
+    if (node.kind === 'languages') {
+      state.languages.forEach(language => {
+        const row = element('div', 'menu-row', language.nativeName);
+        panel.append(row);
+      });
+      return;
+    }
+    const selected = state.previewPath?.[prefix.length] === index;
+    const highlight = node.keys.includes(activeKey);
+    const row = element(node.children ? 'button' : 'div', 'menu-row' +
+      (selected && node.children ? ' selected' : '') + (highlight ? ' highlight' : '') +
+      (node.kind === 'fixed' && node.command === '0' ? ' brand-row' : ''));
+    row.append(menuLabel(node));
+    if (node.children) {
+      row.append(element('span', 'arrow', '›'));
+      row.type = 'button';
+      row.addEventListener('click', () => {
+        state.previewPath = [...prefix, index];
+        state.active = null;
+        renderPreview(true);
+      });
+    }
+    panel.append(row);
+  });
+  return panel;
+}
+
+function contextCard(title) {
+  const card = element('div', 'context-card');
+  const bar = element('div', 'window-title');
+  bar.append(title instanceof Node ? title : element('span', '', title), element('span', 'window-close', '×'));
+  card.append(bar);
+  return card;
+}
+
+function renderContext(key) {
+  const target = document.getElementById('context-preview');
+  target.replaceChildren();
+  if (!key || key === 'nativeName' || key === 'languageCode') return;
+  const context = MODEL.contexts.find(context => context.keys.includes(key));
+  if (!context) {
+    if (findMenuPath(MODEL.menu, key)) return;
+    target.append(uiElement('p', 'context-label', 'contextLabel'));
+    const card = contextCard('Skea Clock');
+    const text = element('div', 'dialog-content');
+    text.append(previewPiece(valueFor(key), key));
+    card.append(text);
+    target.append(card);
+    return;
+  }
+  if (context.kind === 'alarm') {
+    const card = contextCard(previewPiece(valueFor('alarmAdd'), 'alarmAdd'));
+    const body = element('div', 'alarm-example');
+    body.append(element('div', 'alarm-time', '08 : 00'));
+    const days = element('div', 'alarm-week');
+    valueFor('alarmDays').forEach((day, index) => days.append(previewPiece(day, 'alarmDays', index)));
+    body.append(days);
+    card.append(body);
+    target.append(card);
+  } else if (context.kind === 'file') {
+    const card = contextCard(previewPiece(valueFor(context.title), context.title));
+    const body = element('div', 'file-example');
+    body.append(element('div', 'file-path', '▱  Documents  ›  Skea Clock'), element('div', 'file-list', '♪  example.wav'));
+    const filters = element('div', 'file-filter');
+    filterPairs(valueFor(context.filter)).forEach((filter, index) => {
+      const line = element('div');
+      line.append(previewPiece(filter.label, context.filter, index), document.createTextNode(` (${filter.pattern})`));
+      filters.append(line);
+    });
+    body.append(filters);
+    card.append(body);
+    target.append(card);
+  } else {
+    const card = contextCard('Skea Clock');
+    const body = element('div', 'dialog-content');
+    let content = context.keys.filter(item => !context.buttons.includes(item));
+    if (!context.buttons.length && !content.some(item => item.endsWith('Help'))) content = [key];
+    content.forEach(item => {
+      const paragraph = element('p');
+      paragraph.append(previewPiece(valueFor(item), item));
+      body.append(paragraph);
+    });
+    card.append(body);
+    if (context.buttons.length) {
+      const buttons = element('div', 'dialog-buttons');
+      context.buttons.forEach(item => {
+        const button = element('span', 'dialog-button');
+        button.append(previewPiece(valueFor(item), item));
+        buttons.append(button);
+      });
+      card.append(buttons);
+    }
+    target.append(card);
+  }
+}
+
+function renderPreview(manual = false) {
+  if (!state.base) return;
+  const key = state.active?.split(':')[0];
+  if (!manual) state.previewPath = findMenuPath(MODEL.menu, key === 'languageCode' ? 'nativeName' : key) || [];
+  const target = document.getElementById('menu-preview');
+  target.replaceChildren();
+  let nodes = MODEL.menu;
+  const prefix = [];
+  const names = [];
+  for (let depth = 0; ; depth++) {
+    const panel = menuPanel(nodes, prefix);
+    target.append(panel);
+    const chosen = state.previewPath[depth];
+    if (chosen === undefined || !nodes[chosen]) break;
+    const node = nodes[chosen];
+    names.push(menuLabel(node).textContent);
+    if (!node.children) break;
+    prefix.push(chosen);
+    nodes = node.children;
+  }
+  document.getElementById('preview-location').textContent = names.length ? names.join('  ›  ') :
+    uiText(key ? 'dialogLocation' : 'chooseField');
+  for (const panel of target.children) {
+    const active = panel.querySelector('.highlight') || panel.querySelector('.selected');
+    if (active) panel.scrollTop = Math.max(0, active.offsetTop - panel.clientHeight / 2);
+  }
+  renderContext(key);
+}
+
+function chooseLanguageAction(language) {
+  const dialog = document.getElementById('language-action');
+  document.getElementById('upload-file').textContent = `${language.nativeName} (${language.code}) · ${language.name}`;
+  dialog.returnValue = 'cancel';
+  return new Promise(resolve => {
+    dialog.addEventListener('close', () => resolve(dialog.returnValue), {once:true});
+    dialog.showModal();
+  });
+}
+
+function editLanguage(language) {
+  state.values = languageInputs(language.values);
+  state.active = null;
+  for (const id of ['nativeName', 'languageCode']) document.getElementById(id).value = state.values[id] || '';
+  refreshLanguages();
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(state.values));
+    return true;
+  } catch { return false; }
+}
+
+async function installLanguages(files) {
+  const selected = files.filter(file => /\.h$/i.test(file.name));
+  if (!selected.length) throw uiError('selectFiles');
+  const results = await Promise.allSettled(selected.map(async file => {
+    const language = parseLanguage(file.name, await file.text());
+    if (!language) throw uiError('notLanguage', file.name);
+    return language;
+  }));
+  let edited = 0, referenced = 0;
+  const errors = [], notices = [];
+  for (const result of results) {
+    if (result.status === 'rejected') { errors.push(() => errorMessage(result.reason)); continue; }
+    const language = result.value;
+    const action = await chooseLanguageAction(language);
+    if (action === 'edit') {
+      if (!editLanguage(language)) errors.push(() => uiText('autosaveError'));
+      edited++;
+    } else if (action === 'reference') {
+      if (language.code === 'ko') {
+        notices.push(() => uiText('koreanNotice'));
+        continue;
+      }
+      const index = state.languages.findIndex(item => item.code === language.code);
+      if (index === -1) state.languages.push(language);
+      else state.languages[index] = language;
+      refreshLanguages();
+      referenced++;
+    }
+  }
+  showStatus(() => [uiText('uploadSummary', edited, referenced), ...notices.concat(errors).map(message => message())].join(' '), errors.length > 0);
+}
+
+function bindUploads() {
+  let pending = Promise.resolve();
+  const enqueue = files => { pending = pending.then(() => installLanguages(files)).catch(loadError); };
+  const input = document.getElementById('language-files');
+  document.getElementById('upload').addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
+    const files = Array.from(input.files);
+    if (files.length) enqueue(files);
+    input.value = '';
+  });
+  let dragDepth = 0;
+  const dropZone = document.getElementById('drop-zone');
+  document.addEventListener('dragenter', event => {
+    if (!Array.from(event.dataTransfer.types).includes('Files')) return;
+    event.preventDefault();
+    dragDepth++;
+    dropZone.classList.add('dragover');
+  });
+  document.addEventListener('dragleave', () => {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (!dragDepth) dropZone.classList.remove('dragover');
+  });
+  document.addEventListener('dragover', event => {
+    if (!Array.from(event.dataTransfer.types).includes('Files')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  });
+  document.addEventListener('drop', event => {
+    if (!Array.from(event.dataTransfer.types).includes('Files')) return;
+    event.preventDefault();
+    dragDepth = 0;
+    dropZone.classList.remove('dragover');
+    enqueue(Array.from(event.dataTransfer.files));
+  });
+}
+
+const state = {base:null, languages:[], values:{}, active:null, previewPath:[], inputIds:[]};
+const DRAFT_KEY = 'skea-clock-language-editor';
+try {
+  const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
+  state.values = Object.fromEntries(Object.entries(saved).filter(([, value]) => typeof value === 'string'));
+} catch { /* A missing or unavailable browser draft does not prevent file export. */ }
+
+function element(tag, className = '', text = '') {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  node.textContent = text;
+  return node;
+}
+
+function valueFor(key, fallback = true) {
+  if (key === 'languageCode' || key === 'nativeName') return (state.values[key] || '').trim();
+  const field = MODEL.fields.find(field => field.key === key);
+  if (!field || !state.base) return '';
+  const baseline = state.base[key];
+  if (field.count) return baseline.map((value, index) => state.values[`${key}:${index}`] || (fallback ? value : ''));
+  if (baseline.includes('\0')) return filterPairs(baseline)
+    .map((filter, index) => `${state.values[`${key}:${index}`] || (fallback ? filter.label : '')}\0${filter.pattern}\0`).join('') + '\0';
+  return state.values[key] || (fallback ? baseline : '');
+}
+
+function activate(id) {
+  if (state.active === id) return;
+  state.active = id;
+  document.querySelectorAll('.field-row').forEach(row => row.classList.toggle('active', row.dataset.field === id));
+  renderPreview();
+}
+
+function progress() {
+  const count = state.inputIds.filter(id => state.values[id]?.length).length;
+  document.getElementById('progress').textContent = uiText('progress', count, state.inputIds.length);
+}
+
+function bindInput(input, id) {
+  input.dataset.field = id;
+  input.value = state.values[id] || '';
+  input.addEventListener('focus', () => activate(id));
+  input.addEventListener('input', () => {
+    state.values[id] = input.value;
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(state.values)); }
+    catch { showStatus(() => uiText('autosaveError'), true); }
+    activate(id);
+    renderPreview();
+    progress();
+  });
+}
+
+function buildFields() {
+  const target = document.getElementById('fields');
+  target.replaceChildren();
+  state.inputIds = ['nativeName', 'languageCode'];
+  const baseline = languageInputs(state.base);
+  const references = state.languages.map(language => ({
+    name:language.nativeName, values:{...baseline, ...languageInputs(language.values)},
+  }));
+  function row(key, index, note = null, short = false, caption = '') {
+    const id = index === null ? key : `${key}:${index}`;
+    const container = element('div', 'field-row');
+    container.dataset.field = id;
+    container.classList.toggle('active', state.active === id);
+    const label = element('label', 'source-label');
+    label.htmlFor = `input-${id}`;
+    const number = element('span', 'field-number', String(state.inputIds.length - 1).padStart(2, '0'));
+    if (caption) number.append(' · ', uiElement('span', '', caption));
+    label.append(number);
+    for (const reference of references) {
+      const copy = element('span', 'reference-copy');
+      copy.append(element('span', 'reference-name', reference.name), element('span', 'reference-value', reference.values[id]));
+      label.append(copy);
+    }
+    const control = element('div');
+    const multiline = !short && references.some(reference => reference.values[id].length > 65 || reference.values[id].includes('\n'));
+    const input = element(multiline ? 'textarea' : 'input');
+    input.id = `input-${id}`;
+    if (multiline) input.rows = 2;
+    if (short) input.maxLength = 3;
+    input.dataset.uiPlaceholder = 'blankPlaceholder';
+    input.placeholder = uiText('blankPlaceholder');
+    bindInput(input, id);
+    control.append(input);
+    if (note) control.append(uiElement('small', '', ...note));
+    container.append(label, control);
+    container.addEventListener('mouseenter', () => activate(id));
+    container.addEventListener('mouseleave', () => {
+      const focused = document.activeElement?.dataset.field;
+      if (focused) activate(focused);
+    });
+    state.inputIds.push(id);
+    target.append(container);
+  }
+  for (const field of MODEL.fields) {
+    const key = field.key;
+    if (key === 'nativeName' || key === 'languageCode') continue;
+    const value = state.base[key];
+    if (field.count) {
+      const names = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      for (let index = 0; index < value.length; index++)
+        row(key, index, ['dayNote'], true, names[index] || '');
+    } else if (value.includes('\0')) {
+      filterPairs(value).forEach((filter, index) => row(key, index, ['filterNote', filter.pattern]));
+    } else row(key, null, /\s$/.test(value) ? ['trailingSpace'] : null);
+  }
+  progress();
+}
+
+function refreshLanguages() {
+  const list = document.getElementById('reference-list');
+  list.replaceChildren();
+  for (const language of state.languages) {
+    const chip = element('div', 'reference-chip');
+    chip.setAttribute('role', 'listitem');
+    chip.append(element('span', '', language.nativeName));
+    if (language.code === 'ko') chip.append(uiElement('span', 'fixed-tag', 'defaultReference'));
+    else {
+      const remove = element('button', 'remove-reference', '×');
+      remove.type = 'button';
+      remove.dataset.uiLabel = 'removeReference';
+      remove.uiArgs = [language.nativeName];
+      remove.setAttribute('aria-label', uiText('removeReference', language.nativeName));
+      remove.addEventListener('click', () => {
+        state.languages = state.languages.filter(item => item.code !== language.code);
+        refreshLanguages();
+        showStatus(() => uiText('referenceRemoved', language.nativeName));
+      });
+      chip.append(remove);
+    }
+    list.append(chip);
+  }
+  document.getElementById('download').disabled = false;
+  buildFields();
+  renderPreview();
+}
+
+function initializeKorean() {
+  const korean = parseLanguage('ko.h', KOREAN_SOURCE);
+  if (!korean || korean.code !== 'ko') throw uiError('koreanInvalid');
+  for (const field of MODEL.fields) {
+    const value = korean.values[field.key];
+    if (field.count ? !Array.isArray(value) || value.length !== field.count : typeof value !== 'string')
+      throw uiError('sourceMismatch', field.key);
+  }
+  state.base = korean.values;
+  state.languages = [korean];
+  refreshLanguages();
+  showStatus(() => uiText('koreanReady'));
+}
+
+function loadError(error) {
+  showStatus(() => errorMessage(error), true);
+}
+
+for (const id of ['nativeName', 'languageCode']) bindInput(document.getElementById(id), id);
+bindUploads();
+document.querySelectorAll('[data-ui-lang]').forEach(button => {
+  button.addEventListener('click', () => setUiLanguage(button.dataset.uiLang));
+});
+setUiLanguage('ko');
+document.getElementById('download').addEventListener('click', () => {
+  try {
+    const file = makeLanguageHeader(key => valueFor(key, false));
+    const url = URL.createObjectURL(new Blob([file.content], {type:'text/plain;charset=utf-8'}));
+    const link = element('a');
+    link.href = url;
+    link.download = file.name;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showStatus(() => uiText('generated', file.name));
+  } catch (error) { loadError(error); }
+});
+try { initializeKorean(); }
+catch (error) { loadError(error); }
+
+  </script>
+</body>
+</html>

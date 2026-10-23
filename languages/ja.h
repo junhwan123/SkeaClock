@@ -3,6 +3,12 @@
 // Keep menu terms from README.ja.md; Korean strings cover untranslated entries.
 const UiStrings JapaneseStrings = [] {
     UiStrings text = KoreanStrings;
+    text.languageCode = L"ja";
+    text.nativeName = L"日本語";
+    text.languageFileChoose = L"言語ファイルを選択...";
+    text.languageFileTitle = L"言語ファイルを選択";
+    text.languageFileFilter = L"言語ファイル\0*.h\0すべてのファイル\0*.*\0\0";
+    text.languageFileError = L"言語ファイルを読み込めませんでした。ファイルが存在し、正しい言語ファイル形式であることを確認してください。";
     text.background = L"背景表示";
     text.ticks = L"目盛り表示";
     text.numbers = L"数字表示";
@@ -32,7 +38,15 @@ const UiStrings JapaneseStrings = [] {
     text.updateVisitGithub = L"Github ページを開く";
     text.updateIgnore = L"この更新をスキップ";
     text.updateCancel = L"キャンセル";
-    text.alarmDays = L"日月火水木金土";
+    text.alarmDays = {
+        L"日",
+        L"月",
+        L"火",
+        L"水",
+        L"木",
+        L"金",
+        L"土",
+    };
     text.alarmNoDays = L"曜日なし";
     text.alarmFileFilter =
         L"対応するメディア\0*.wav;*.mp3;*.m4a;*.aac;*.flac;*.wma;*.mp4;*.m4v;*.mov;*.wmv\0"

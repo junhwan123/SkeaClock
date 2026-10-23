@@ -1,5 +1,5 @@
 ﻿$ErrorActionPreference = 'Stop'
-$productVersion = '2.1.0'
+$productVersion = '2.1.2'
 $lowResolutionScale = '0.6'
 $root = Split-Path $PSScriptRoot -Parent
 $work = Join-Path $PSScriptRoot '.build'
@@ -49,6 +49,7 @@ Get-ChildItem -LiteralPath $source -Recurse -File -Filter '*.ico' | ForEach-Obje
     New-Item -ItemType Directory -Force -Path (Split-Path $target -Parent) | Out-Null
     Copy-Item -LiteralPath $_.FullName -Destination $target
 }
+Copy-Item -LiteralPath (Join-Path $source 'clock-dial-data.h') -Destination (Join-Path $work 'sources')
 $sounds = @('idle1', 'idle2', 'smash', 'touch_start', 'touch_end', 'touch1', 'touch2', 'touch3',
     'pat_start', 'pat_end', 'pat1', 'pat2', 'pat3', 'blank1', 'answer', 'smile', 'alert', 'base_alert')
 $cpp = [IO.File]::ReadAllText((Join-Path $work 'skea-clock.cpp')).Replace("`r`n", "`n")
@@ -118,4 +119,6 @@ foreach ($variant in $variants) {
 }
 Set-Location -LiteralPath $PSScriptRoot
 Clear-Work
+& python.exe -B (Join-Path $root 'language-editor\generate.py')
+if ($LASTEXITCODE -ne 0) { throw 'Language editor generation failed.' }
 Get-Item -LiteralPath $outputs | Select-Object Name, Length

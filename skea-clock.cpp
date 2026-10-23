@@ -120,7 +120,7 @@ void SaveSettings() {
     WritePrivateProfileStringW(L"clock", L"numbers", showNumbers ? L"1" : L"0", settingsPath.c_str());
     WritePrivateProfileStringW(L"clock", L"markings", nullptr, settingsPath.c_str());
     WritePrivateProfileStringW(L"clock", L"display", selectedDisplay.c_str(), settingsPath.c_str());
-    WritePrivateProfileStringW(L"clock", L"language", selectedLanguage.c_str(), settingsPath.c_str());
+    SaveLanguageSettings(settingsPath);
     WritePrivateProfileStringW(L"clock", L"size", nullptr, settingsPath.c_str());
     SaveSoundSettings(settingsPath);
     SaveWindowBehaviorSettings(settingsPath);
@@ -459,6 +459,7 @@ void AppendSoundMenus(HMENU menu) {
 void ShowMenu(HWND window, POINT point) {
     DismissAlarm(window);
     if (exceptionMenu) return;
+    ReloadCustomLanguage(window, settingsPath);
     MenuIcons icons = { GetDpiForWindow(window), {} };
     HMENU menu = CreatePopupMenu();
     AppendMenuW(menu, MF_STRING | MF_DISABLED, 0, L"Skea clock");
@@ -766,9 +767,18 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
             }
             return 0;
         }
-        if (LOWORD(wParam) >= LanguageKorean &&
-            LOWORD(wParam) < LanguageKorean + static_cast<int>(std::size(LanguagePacks))) {
-            selectedLanguage = LanguagePacks[LOWORD(wParam) - LanguageKorean].code;
+        if (LOWORD(wParam) >= LanguageFileChoose &&
+            LOWORD(wParam) < LanguageFirst + static_cast<int>(std::size(LanguagePacks))) {
+            if (LOWORD(wParam) == LanguageFileChoose) {
+                if (!ChooseLanguageFile(window)) return 0;
+            } else if (LOWORD(wParam) == LanguageCustom) {
+                if (!ReloadCustomLanguage(window, settingsPath)) return 0;
+                useCustomLanguage = true;
+                selectedLanguage = customLanguage->strings.languageCode;
+            } else {
+                useCustomLanguage = false;
+                selectedLanguage = LanguagePacks[LOWORD(wParam) - LanguageFirst].code;
+            }
             SaveSettings();
             lastStep = -1;
             if (alarmEditorWindow) {

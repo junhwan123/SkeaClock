@@ -1,44 +1,27 @@
-# 언어 문구 관리
+# Skea Clock Language Editor
 
-- `ko.h`: 기존 한국어 문구
-- `ja.h`: 일본어 문구. `README.ja.md`에 명시된 메뉴 용어를 우선 사용합니다.
-- `template.h`: 추가 언어를 만들 때 복사할 템플릿
-- `../clock-localization.h`: 문구 항목 정의와 사용 가능한 언어 목록
+Open `language-editor.html` in a modern browser. It works offline as a single file; no installation, server, or developer tools are needed.
 
-## 언어 추가
+## Create a language
 
-1. `template.h`를 복사해 새 파일을 만듭니다. 예: `en.h`.
-2. `NewLanguageStrings`를 고유한 이름으로 바꿉니다. 예: `EnglishStrings`.
-3. 각 `text.항목 = L"...";`의 문자열을 번역합니다. 항목 이름은 유지합니다.
-4. `clock-localization.h`에서 기존 언어 include 다음에 새 파일을 추가합니다.
+1. Use **KOR / ENG** at the top to choose the editor's interface language. Reference translations and your input stay unchanged.
+2. Enter a **Display name** for the app's Language menu and a **Language code**, such as `fr` or `pt-BR` (up to 15 characters).
+3. Translate the phrases beside the built-in Korean source. Hover over a field or place the cursor in it to highlight where the phrase appears in the menu or dialog preview.
+4. Click **Download language file** to save your `.h` file.
+5. In Skea Clock, right-click the clock and choose **Language → Choose language file…** (`언어 파일 선택…` in Korean), then select the downloaded file. No rebuild is needed.
 
-   ```cpp
-   #include "languages/en.h"
-   ```
+## Edit and compare
 
-5. 같은 파일의 `LanguagePacks` 배열 끝에 언어 코드, 해당 언어의 이름, 문구 묶음을 등록합니다.
+- Upload or drag and drop one or more `.h` language files onto the page.
+- Choose **Edit language file** to replace the editor's display name, code, and translation inputs with that file's contents.
+- Choose **Add as reference** to show its translations alongside Korean without replacing your input. Remove a reference with its **×** button; the built-in Korean reference always remains.
+- The preview updates as you type. Alarm times, filenames, and display details are examples.
 
-   ```cpp
-   { L"en", L"English", EnglishStrings },
-   ```
+## Saving and untranslated phrases
 
-6. 앱을 다시 빌드합니다. `Language` 메뉴, 선택 처리, INI 저장·불러오기는 등록된 목록을 사용합니다.
-
-언어 코드는 다른 항목과 겹치지 않는 15자 이하의 값을 사용합니다.
-기존 `ko`, `ja` 항목과 순서는 유지하고 새 언어를 뒤에 추가합니다.
-번역하지 않은 항목은 한국어를 사용합니다.
-언어 파일은 컴파일되어 EXE에 포함되므로 실행 시 별도로 배포할 필요가 없습니다.
-
-## 번역 시 유지할 형식
-
-- `Language` 메뉴 제목은 언어 파일에 넣지 않으며 항상 영어로 표시합니다.
-- 언어 이름은 등록된 언어의 고유 표기를 사용합니다. 예: `한국어`, `日本語`.
-- `alarmDays`는 일요일부터 토요일까지 한 글자씩 총 7글자입니다. 예: `日月火水木金土`.
-- `trayTooltip`의 `%04u`, `%02u`는 날짜·시간 값의 자리이므로 개수와 순서를 유지합니다.
-- 파일 필터는 표시 이름만 번역합니다. 확장자, `\0` 구분자, 마지막 `\0\0`은 유지합니다.
-- `displayPrefix` 끝의 공백과 `displayPrimary`의 구분자는 디스플레이 번호와 결합할 때 사용됩니다.
-- `Skea clock` 제품명과 실제 파일·폴더 이름은 그대로 사용합니다.
-
-Windows 기본 파일 선택창의 열기·취소 버튼 등은 운영체제의 표시 언어를 따릅니다.
-앱에서 지정하는 창 제목과 파일 종류 문구는 선택한 언어를 사용합니다.
+- Blank translations are saved as blank. The app and preview use Korean for empty or missing phrases, including phrases added by later app updates.
+- Each weekday label can contain up to three characters. Blank weekday labels also fall back to Korean.
+- The editor preserves file filter patterns; translate only their display names. Keep any trailing spaces indicated beside a field.
+- Inputs are saved locally in your browser when browser storage is available. Download your file to keep or share a copy; uploaded reference files are not saved in the draft.
+- Skea Clock remembers one custom language file's path. Keep the file at that location: moving, deleting, or invalidating it causes a warning and removes its menu entry. Selecting another valid custom file replaces the previous one.
 

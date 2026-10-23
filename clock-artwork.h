@@ -909,10 +909,10 @@ void DrawArtwork(Graphics& g, const SYSTEMTIME& now, bool drawDial, bool drawTic
         image->SetActive(image == primary || touchLayer || endLayer);
     }
     auto& dial = *clockDial;
-    if (drawDial) g.FillEllipse(&dial.background, clockCenter.X - DialRadius, clockCenter.Y - DialRadius, DialRadius * 2, DialRadius * 2);
+    if (drawDial) g.FillPath(&dial.background, dial.clip.get());
     g.SetInterpolationMode(InterpolationModeBilinear);
     GraphicsState clipState = g.Save();
-    g.SetClip(&dial.clip, CombineModeReplace);
+    g.SetClip(dial.clip.get(), CombineModeReplace);
     if (cheekDragging || (touchReleaseActive && activeFrame < TouchBounceFrameCount)) {
         const PointF position = GifPosition();
         auto head = cheekDragging ? WarpedTouchHead() : WarpedTouchEndHead();
@@ -960,8 +960,8 @@ void DrawArtwork(Graphics& g, const SYSTEMTIME& now, bool drawDial, bool drawTic
     }
     if (drawNumbers) {
         for (auto& number : dial.numbers) {
-            g.DrawPath(&dial.numberOutline, &number);
-            g.FillPath(&dial.ink, &number);
+            g.DrawPath(&dial.numberOutline, number.get());
+            g.FillPath(&dial.ink, number.get());
         }
     }
     if (HandsVisible()) {

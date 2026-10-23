@@ -1,7 +1,14 @@
 #pragma once
+#include <array>
 #include <iterator>
 
 struct UiStrings {
+    const wchar_t* languageCode;
+    const wchar_t* nativeName;
+    const wchar_t* languageFileChoose;
+    const wchar_t* languageFileTitle;
+    const wchar_t* languageFileFilter;
+    const wchar_t* languageFileError;
     const wchar_t* background;
     const wchar_t* ticks;
     const wchar_t* numbers;
@@ -31,7 +38,7 @@ struct UiStrings {
     const wchar_t* updateVisitGithub;
     const wchar_t* updateIgnore;
     const wchar_t* updateCancel;
-    const wchar_t* alarmDays;
+    std::array<const wchar_t*, 7> alarmDays;
     const wchar_t* alarmNoDays;
     const wchar_t* alarmFileFilter;
     const wchar_t* alarmFileTitle;
@@ -48,6 +55,8 @@ struct UiStrings {
 
 #include "languages/ko.h"
 #include "languages/ja.h"
+#include "languages/en.h"
+#include "languages/zh-CN.h"
 
 struct LanguagePack {
     const wchar_t* code;
@@ -56,12 +65,17 @@ struct LanguagePack {
 };
 
 const LanguagePack LanguagePacks[] = {
-    { L"ko", L"한국어", KoreanStrings },
-    { L"ja", L"日本語", JapaneseStrings },
+    { KoreanStrings.languageCode, KoreanStrings.nativeName, KoreanStrings },
+    { JapaneseStrings.languageCode, JapaneseStrings.nativeName, JapaneseStrings },
+    { EnglishStrings.languageCode, EnglishStrings.nativeName, EnglishStrings },
+    { SimplifiedChineseStrings.languageCode, SimplifiedChineseStrings.nativeName, SimplifiedChineseStrings },
 };
 std::wstring selectedLanguage = L"ko";
 
+#include "clock-custom-language.h"
+
 const UiStrings& UiText() {
+    if (useCustomLanguage && customLanguage) return customLanguage->strings;
     for (const auto& language : LanguagePacks)
         if (selectedLanguage == language.code) return language.strings;
     return KoreanStrings;

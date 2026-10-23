@@ -2,6 +2,12 @@
 
 const UiStrings KoreanStrings = [] {
     UiStrings text = {};
+    text.languageCode = L"ko";
+    text.nativeName = L"한국어";
+    text.languageFileChoose = L"언어 파일 선택...";
+    text.languageFileTitle = L"언어 파일 선택";
+    text.languageFileFilter = L"언어 파일\0*.h\0모든 파일\0*.*\0\0";
+    text.languageFileError = L"언어 파일을 불러오지 못했습니다. 파일이 존재하는지와 올바른 언어 파일 형식인지 확인해 주세요.";
     text.background = L"배경 표시";
     text.ticks = L"눈금 표시";
     text.numbers = L"숫자 표시";
@@ -31,7 +37,15 @@ const UiStrings KoreanStrings = [] {
     text.updateVisitGithub = L"Github 페이지 방문";
     text.updateIgnore = L"이번 업데이트 무시";
     text.updateCancel = L"취소";
-    text.alarmDays = L"일월화수목금토";
+    text.alarmDays = {
+        L"일",
+        L"월",
+        L"화",
+        L"수",
+        L"목",
+        L"금",
+        L"토",
+    };
     text.alarmNoDays = L"요일 없음";
     text.alarmFileFilter =
         L"지원되는 미디어\0*.wav;*.mp3;*.m4a;*.aac;*.flac;*.wma;*.mp4;*.m4v;*.mov;*.wmv\0"

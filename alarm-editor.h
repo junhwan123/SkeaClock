@@ -30,10 +30,14 @@ std::wstring FormatAlarmTime(const Alarm& alarm) {
 }
 
 std::wstring AlarmDaysText(unsigned days) {
-    const wchar_t* labels = UiText().alarmDays;
+    const auto& labels = UiText().alarmDays;
     constexpr int bits[] = { 6, 0, 1, 2, 3, 4, 5 };
     std::wstring text;
-    for (int i = 0; i < 7; ++i) if (days & (1u << bits[i])) text += labels[i];
+    for (int i = 0; i < 7; ++i) {
+        if (!(days & (1u << bits[i]))) continue;
+        if (!text.empty()) text += L" ";
+        text += labels[i];
+    }
     return text.empty() ? UiText().alarmNoDays : text;
 }
 
@@ -124,6 +128,8 @@ void InitializeAlarmMinuteTracking(const SYSTEMTIME& now) {
     lastAlarmMinuteKey = AlarmMinuteKey(now);
 }
 
+#include "alarm-editor-font.h"
+
 void LayoutAlarmEditor(HWND window) {
     RECT client;
     GetClientRect(window, &client);
@@ -206,9 +212,11 @@ LRESULT CALLBACK AlarmEditorProc(HWND window, UINT message, WPARAM wParam, LPARA
         alarmMinuteEdit = CreateWindowExW(0, L"EDIT", minute,
             WS_CHILD | WS_VISIBLE | ES_CENTER | ES_NUMBER, 0, 0, 0, 0,
             window, nullptr, GetModuleHandleW(nullptr), nullptr);
-        alarmTimeFont = CreateFontW(-MulDiv(18, alarmEditorDpi, 72), 0, 0, 0, FW_SEMIBOLD,
-            FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-            CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
+        alarmMenuFont = ReadAlarmMenuFont();
+        HDC dc = GetDC(window);
+        alarmTimeFont = CreateFittedAlarmFont(dc, nullptr, MulDiv(24, alarmEditorDpi, 96),
+            MulDiv(48, alarmEditorDpi, 96) - 4, MulDiv(32, alarmEditorDpi, 96) - 2);
+        if (dc) ReleaseDC(window, dc);
         SendMessageW(alarmHourEdit, EM_SETLIMITTEXT, 2, 0);
         SendMessageW(alarmMinuteEdit, EM_SETLIMITTEXT, 2, 0);
         SendMessageW(alarmHourEdit, WM_SETFONT, reinterpret_cast<WPARAM>(alarmTimeFont), TRUE);
@@ -242,42 +250,18 @@ LRESULT CALLBACK AlarmEditorProc(HWND window, UINT message, WPARAM wParam, LPARA
         graphics.SetSmoothingMode(SmoothingModeAntiAlias);
         SolidBrush background(Color(255, 0xDF, 0xF7, 0xF5));
         SolidBrush selected(Color(245, 255, 255, 255));
-        SolidBrush text(Color(255, 50, 63, 72));
-        SolidBrush sundayText(Color(255, 205, 62, 62));
-        SolidBrush saturdayText(Color(255, 55, 105, 190));
         Pen separator(Color(190, 255, 255, 255), 2.0f);
         Pen checkPen(Color(255, 70, 83, 92), 2.5f);
         Pen closePen(Color(255, 110, 120, 126), 2.3f);
         graphics.FillRectangle(&background, 0, 0, client.right, client.bottom);
         graphics.DrawLine(&separator, 10.0f, client.bottom * .5f,
             client.right - 10.0f, client.bottom * .5f);
-        const int actionSpace = MulDiv(82, alarmEditorDpi, 96);
-        const int editWidth = MulDiv(48, alarmEditorDpi, 96);
-        const int editGap = MulDiv(18, alarmEditorDpi, 96);
-        const int groupWidth = editWidth * 2 + editGap;
-        const int groupLeft = std::max(MulDiv(14, alarmEditorDpi, 96),
-            (static_cast<int>(client.right) - actionSpace - groupWidth) / 2);
-        const float colonX = static_cast<float>(groupLeft + editWidth + editGap / 2);
-        FontFamily family(L"Segoe UI");
-        Font timeFont(&family, 22.0f * alarmEditorDpi / 96.0f, FontStyleRegular, UnitPixel);
-        Font dayFont(&family, 14.0f * alarmEditorDpi / 96.0f, FontStyleRegular, UnitPixel);
-        StringFormat centered;
-        centered.SetAlignment(StringAlignmentCenter);
-        centered.SetLineAlignment(StringAlignmentCenter);
-        graphics.DrawString(L":", -1, &timeFont,
-            RectF(colonX - 8, 0, 16, client.bottom * .5f), &centered, &text);
-        const wchar_t* dayLabels = UiText().alarmDays;
         const float dayRadius = std::min(14.0f * alarmEditorDpi / 96.0f,
             client.right / 7.0f * .4f);
         for (int i = 0; i < 7; ++i) {
             const PointF center = AlarmDayCenter(i, client.right, client.bottom);
             if (alarmDraft.days & (1u << AlarmDayBit(i))) graphics.FillEllipse(&selected,
                 center.X - dayRadius, center.Y - dayRadius, dayRadius * 2, dayRadius * 2);
-            Brush* dayText = i == 0 ? static_cast<Brush*>(&sundayText)
-                : i == 6 ? static_cast<Brush*>(&saturdayText) : static_cast<Brush*>(&text);
-            graphics.DrawString(dayLabels + i, 1, &dayFont,
-                RectF(center.X - dayRadius, center.Y - dayRadius, dayRadius * 2, dayRadius * 2),
-                &centered, dayText);
         }
         const PointF check = AlarmCheckCenter(client.right, client.bottom);
         const PointF close = AlarmCloseCenter(client.right, client.bottom);
@@ -298,6 +282,11 @@ LRESULT CALLBACK AlarmEditorProc(HWND window, UINT message, WPARAM wParam, LPARA
         graphics.DrawLines(&closePen, binOutline, 4);
         graphics.DrawLine(&closePen, close.X - 2, close.Y, close.X - 2, close.Y + 4);
         graphics.DrawLine(&closePen, close.X + 2, close.Y, close.X + 2, close.Y + 4);
+        HDC textDc = graphics.GetHDC();
+        if (textDc) {
+            DrawAlarmEditorText(textDc, client);
+            graphics.ReleaseHDC(textDc);
+        }
         EndPaint(window, &paint);
         return 0;
     }

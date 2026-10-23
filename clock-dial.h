@@ -1,9 +1,12 @@
 #pragma once
+#include "sources/clock-dial-data.h"
+
+static_assert(ClockDialData::Radius == DialRadius, "Regenerate clock-dial-data.h after changing DialRadius.");
 
 // Geometry stays in artwork coordinates; the renderer scales it for each window size.
 struct ClockDial {
-    GraphicsPath clip;
-    GraphicsPath numbers[12];
+    std::unique_ptr<GraphicsPath> clip;
+    std::unique_ptr<GraphicsPath> numbers[12];
     PointF tickStart[60], tickEnd[60];
     SolidBrush background{ Color(255, 0xDF, 0xF7, 0xF5) };
     SolidBrush ink{ Color(255, 50, 63, 72) };
@@ -13,28 +16,25 @@ struct ClockDial {
     Pen minorTick{ Color(220, 84, 99, 109), 1.5f };
     Pen numberOutline{ Color(255, 255, 255, 255), 2.5f };
 
+    static std::unique_ptr<GraphicsPath> LoadPath(const ClockDialData::Path& data, PointF center) {
+        auto path = std::make_unique<GraphicsPath>(data.points, data.types, data.count);
+        Matrix placement(1, 0, 0, 1, center.X, center.Y);
+        if (path->GetLastStatus() != Ok || path->Transform(&placement) != Ok) return nullptr;
+        return path;
+    }
+
     bool Initialize(PointF center) {
-        if (clip.AddEllipse(center.X - DialRadius, center.Y - DialRadius,
-            DialRadius * 2, DialRadius * 2) != Ok) return false;
+        clip = LoadPath(ClockDialData::Clip, center);
+        if (!clip) return false;
         for (int i = 0; i < 60; ++i) {
-            const float angle = i * Pi / 30;
-            auto at = [&](float radius) {
-                return PointF(center.X + std::sin(angle) * radius, center.Y - std::cos(angle) * radius);
-            };
-            tickStart[i] = at(DialRadius - (i % 5 == 0 ? 14 : 7));
-            tickEnd[i] = at(DialRadius);
+            const auto& tick = ClockDialData::Ticks[i];
+            tickStart[i] = PointF(center.X + tick.start.X, center.Y + tick.start.Y);
+            tickEnd[i] = PointF(center.X + tick.end.X, center.Y + tick.end.Y);
         }
-        FontFamily family(L"Segoe UI");
-        StringFormat format;
-        format.SetAlignment(StringAlignmentCenter);
-        format.SetLineAlignment(StringAlignmentCenter);
         numberOutline.SetLineJoin(LineJoinRound);
-        for (int i = 1; i <= 12; ++i) {
-            const std::wstring number = std::to_wstring(i);
-            const PointF p(center.X + std::sin(i * Pi / 6) * (DialRadius - 14),
-                center.Y - std::cos(i * Pi / 6) * (DialRadius - 14));
-            if (numbers[i - 1].AddString(number.c_str(), -1, &family, FontStyleRegular, 16, p, &format) != Ok)
-                return false;
+        for (int i = 0; i < 12; ++i) {
+            numbers[i] = LoadPath(ClockDialData::Numbers[i], center);
+            if (!numbers[i]) return false;
         }
         return true;
     }
