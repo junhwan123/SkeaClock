@@ -1,8 +1,41 @@
-#include "clock-resources.h"
-SKEA_APP_ICON ICON "sources\\SkeaClock.ico"
-SKEA_MENU_BELL ICON "sources\\codicons\\bell.ico"
-SKEA_MENU_MOVE ICON "sources\\codicons\\move.ico"
-SKEA_MENU_VM ICON "sources\\codicons\\vm.ico"
-SKEA_MENU_CLOSE ICON "sources\\codicons\\close.ico"
-SKEA_MENU_GLOBE ICON "sources\\codicons\\globe.ico"
-SKEA_MENU_GITHUB ICON "sources\\codicons\\github-alt.ico"
+#include "src/menu/menu-icons.h"
+
+1 ICON "sources\\common\\SkeaClock.ico"
+SKEA_MENU_BELL ICON "sources\\common\\icon\\bell.ico"
+SKEA_MENU_MOVE ICON "sources\\common\\icon\\move.ico"
+SKEA_MENU_VM ICON "sources\\common\\icon\\display.ico"
+SKEA_MENU_CLOSE ICON "sources\\common\\icon\\power.ico"
+SKEA_MENU_GLOBE ICON "sources\\common\\icon\\globe.ico"
+SKEA_MENU_GITHUB ICON "sources\\common\\icon\\code.ico"
+LANG_JA RCDATA "languages\\ja.h"
+LANG_EN RCDATA "languages\\en.h"
+LANG_ZH_CN RCDATA "languages\\zh-CN.h"
+
+1 VERSIONINFO
+FILEVERSION SKEA_FILE_VERSION
+PRODUCTVERSION SKEA_PRODUCT_VERSION
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS 0x40004L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041204B0"
+        BEGIN
+            VALUE "CompanyName", "Junhwan123"
+            VALUE "FileDescription", "Skea Clock"
+            VALUE "FileVersion", SKEA_FILE_VERSION_TEXT
+            VALUE "InternalName", SKEA_INTERNAL_NAME
+            VALUE "LegalCopyright", ""
+            VALUE "OriginalFilename", SKEA_ORIGINAL_FILENAME
+            VALUE "ProductName", "Skea Clock"
+            VALUE "ProductVersion", SKEA_PRODUCT_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0412, 1200
+    END
+END

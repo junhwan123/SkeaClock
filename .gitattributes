@@ -1,0 +1,2 @@
+SkeaClock.exe filter=lfs diff=lfs merge=lfs -text
+SkeaClock_low.exe filter=lfs diff=lfs merge=lfs -text

@@ -4,39 +4,42 @@ const UiStrings EnglishStrings = [] {
     UiStrings text = KoreanStrings;
     text.languageCode = L"en";
     text.nativeName = L"English";
-    text.languageFileChoose = L"Choose language file...";
+    text.languageFileChoose = L"Choose language file";
     text.languageFileTitle = L"Choose language file";
-    text.languageFileFilter = L"Language files\0*.h\0All files\0*.*\0\0";
-    text.languageFileError = L"Could not load the language file. Check that the file exists and has a valid language file format.";
+    text.languageFiles = L"Language files";
+    text.allFiles = L"All files";
     text.background = L"Show background";
+    text.timeDisplay = L"Show time";
     text.ticks = L"Show tick marks";
     text.numbers = L"Show numbers";
+    text.hologram = L"Hologram effect";
+    text.format24Hour = L"24 hour format";
     text.alarmAdd = L"Add alarm";
     text.alarmEdit = L"Edit alarm";
     text.alarmDelete = L"Delete alarm";
     text.effectVolume = L"Sound effect volume";
-    text.alarmFileChoose = L"Choose alarm file...";
+    text.alarmFileChoose = L"Choose alarm file";
     text.alarmDefault = L"Default alarm";
     text.volume = L"Volume";
     text.alarmSound = L"Alarm sound";
+    text.musicSound = L"Music settings";
+    text.musicFileChoose = L"Choose music file";
+    text.musicAutoPlay = L"Play music at startup";
+    text.tableDisplay = L"Show table";
+    text.playerDisplay = L"Show player";
     text.alwaysOnTop = L"Always on top";
-    text.topmostExceptions = L"Always on top exceptions";
-    text.noPrograms = L"(No programs)";
-    text.programChoose = L"Choose program...";
+    text.topmostExceptions = L"Exceptions to Always on Top";
+    text.noPrograms = L"No programs";
+    text.programChoose = L"Choose program";
     text.runAtStartup = L"Run at startup";
-    text.startupError = L"Could not change the startup setting. Please check the executable path length and registry access permissions.";
     text.taskbar = L"Show on taskbar";
     text.layout = L"Adjust size and position";
     text.displaySelect = L"Display";
-    text.displayPrefix = L"Display ";
-    text.displayPrimary = L" · Primary";
+    text.displayPrefix = L"Display";
+    text.displayPrimary = L"Primary";
     text.exit = L"Exit";
     text.autoUpdateCheck = L"Automatically check for updates";
-    text.githubVisit = L"Visit Github";
-    text.updateAvailable = L"An update is available. Would you like to download it?";
-    text.updateVisitGithub = L"Visit Github page";
-    text.updateIgnore = L"Skip this update";
-    text.updateCancel = L"Cancel";
+    text.githubVisit = L"Visit GitHub";
     text.alarmDays = {
         L"Sun",
         L"Mon",
@@ -47,19 +50,34 @@ const UiStrings EnglishStrings = [] {
         L"Sat",
     };
     text.alarmNoDays = L"No days selected";
-    text.alarmFileFilter =
-        L"Supported media\0*.wav;*.mp3;*.m4a;*.aac;*.flac;*.wma;*.mp4;*.m4v;*.mov;*.wmv\0"
-        L"Audio files\0*.wav;*.mp3;*.m4a;*.aac;*.flac;*.wma\0"
-        L"Video files\0*.mp4;*.m4v;*.mov;*.wmv\0\0";
+    text.mediaFiles = L"Supported media";
+    text.audioFiles = L"Audio files";
+    text.videoFiles = L"Video files";
     text.alarmFileTitle = L"Choose alarm sound file";
-    text.programFileFilter = L"Programs\0*.exe\0All files\0*.*\0\0";
-    text.programFileTitle = L"Choose program for always on top exceptions";
-    text.mediaPackMissing = L"The Windows Media Pack is missing. The app may not work correctly.";
-    text.alarmFileError = L"An error occurred while playing the selected alarm file";
-    text.artworkLoadError = L"Could not load the PNG animation, clock hand images, or coordinate settings in locate data.";
-    text.artworkLoadHelp = L"Run build.cmd again and keep the bin and sources folders together.";
-    text.standaloneArtworkLoadHelp = L"Download the standalone EXE again, or delete the assets folder in the user data folder and restart the app.";
-    text.clockWindowError = L"Could not create the clock window.";
-    text.standaloneDataError = L"Could not prepare SkeaClock data in LocalAppData. Please check available disk space and folder permissions.";
+    text.programFiles = L"Programs";
+    text.programFileTitle = L"Choose a program to exclude from Always on Top";
+
+    // Notices and error dialogs
+    text.updateAvailable = L"An update is available";
+    text.updateDownloadQuestion = L"Would you like to download it";
+    text.updateDownload = L"Open download page";
+    text.updateCancel = L"Cancel";
+    text.settingsDowngradeWarning = L"This version of Skea Clock is older than the version you used previously";
+    text.settingsDowngradeContinue = L"Run anyway";
+    text.standaloneDataError = L"Could not create the assets folder";
+    text.standaloneDataHelp = L"Please check available disk space and access permissions";
+    text.artworkLoadError = L"An asset error occurred";
+    text.artworkRecoveryHelp = L"Please restart the program";
+    text.runtimeError = L"An error occurred while running the program";
+    text.settingsVersionError = L"Could not read the settings version or update Skea Clock settings";
+    text.languageFileError = L"Could not load the language file";
+    text.languageFileHelp = L"Check that it exists and is in the correct format";
+    text.startupError = L"Could not change the startup setting";
+    text.startupHelp = L"Please check the executable path length and registry access permissions";
+    text.alarmFileError = L"An error occurred while playing the selected alarm sound file";
+    text.mediaValidationStartError = L"Could not start the audio file check";
+    text.mediaValidationIncomplete = L"Could not complete the audio file check";
+    text.mediaPackMissing = L"The Windows media components needed to check the audio file are unavailable";
+    text.musicFileError = L"Could not play the selected music file";
     return text;
 }();
